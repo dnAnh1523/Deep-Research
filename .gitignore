@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend build output
+frontend/dist/
+frontend/node_modules/
+
+# Research output (generated, not source)
+latest_report.md
+data/reports/
+
+# Local provider configuration may contain private endpoint metadata
+config/providers.json
+
+# Local demo recordings and screenshots
+docs/assets/local/
+
+# Byte-compiled
+*.pyc
+
+# Local coding-agent instructions and tooling
+.agents/
+.codex/
+.claude/
+.cursor/
+AGENTS.md
+CLAUDE.md
+
+# Internal agent/build documentation
+docs/module-specs/
+docs/harness-architecture-research.md
+docs/knowledge-seed.md
+docs/working-with-antigravity.md
+docs/coding-standards.md

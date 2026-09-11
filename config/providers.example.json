@@ -1,0 +1,49 @@
+{
+  "primary": [
+    {
+      "name": "openai",
+      "protocol": "openai-compatible",
+      "model": "gpt-4o-mini",
+      "base_url": "https://api.openai.com/v1",
+      "api_key_env": "OPENAI_API_KEY",
+      "supports_tools": true,
+      "supports_structured_output": true
+    },
+    {
+      "name": "anthropic",
+      "protocol": "anthropic",
+      "model": "claude-3-5-sonnet-latest",
+      "base_url": "https://api.anthropic.com/v1",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "supports_tools": true,
+      "supports_structured_output": false
+    },
+    {
+      "name": "ollama-local",
+      "provider": "ollama",
+      "protocol": "openai-compatible",
+      "model": "qwen2.5:7b",
+      "base_url": "http://127.0.0.1:11434/v1",
+      "api_key_env": "OLLAMA_API_KEY",
+      "supports_tools": true,
+      "supports_structured_output": false,
+      "extra_params": {
+        "temperature": 0.2
+      }
+    }
+  ],
+  "fallback": {
+    "name": "openrouter-fallback",
+    "provider": "openrouter",
+    "protocol": "openai-compatible",
+    "model": "openai/gpt-4o-mini",
+    "base_url": "https://openrouter.ai/api/v1",
+    "api_key_env": "OPENROUTER_API_KEY",
+    "supports_tools": true,
+    "supports_structured_output": true,
+    "extra_params": {
+      "HTTP-Referer": "https://github.com/your-user/your-repo",
+      "X-Title": "Deep Research Agent"
+    }
+  }
+}
