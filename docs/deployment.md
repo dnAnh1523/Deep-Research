@@ -5,7 +5,7 @@
 ```bash
 copy .env.example .env
 copy config/providers.example.json config/providers.json
-# edit .env and config/providers.json
+# edit .env and config/providers.json; remove unused provider entries
 docker compose up --build
 ```
 

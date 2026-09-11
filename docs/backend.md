@@ -8,9 +8,9 @@
 
 | File | Mục đích | Lệnh |
 |---|---|---|
-| [`run_demo.py`](file:///f:/AI_ML%20Projects/Deep%20Research/run_demo.py) | CLI runner — chạy pipeline đầy đủ từ terminal, xuất báo cáo ra `latest_report.md` | `python run_demo.py` |
-| [`run_fullstack.py`](file:///f:/AI_ML%20Projects/Deep%20Research/run_fullstack.py) | Fullstack runner — khởi động Backend (port 8000) + Frontend (port 3000) đồng thời | `python run_fullstack.py` |
-| [`api/app.py`](file:///f:/AI_ML%20Projects/Deep%20Research/api/app.py) | FastAPI server — REST + SSE endpoints | `uvicorn api.app:app --port 8000` |
+| [`run_demo.py`](../run_demo.py) | CLI runner — chạy pipeline đầy đủ từ terminal, xuất báo cáo vào `REPORT_STORAGE_DIR` | `python run_demo.py` |
+| [`run_fullstack.py`](../run_fullstack.py) | Fullstack runner — khởi động Backend (port 8000) + Frontend (port 3000) đồng thời | `python run_fullstack.py` |
+| [`api/app.py`](../api/app.py) | FastAPI server — REST + SSE endpoints | `uvicorn api.app:app --port 8000` |
 
 ---
 
@@ -22,55 +22,55 @@ Mỗi module chứa `node.py` (LangGraph node function) và có thể chứa dom
 
 | Module | Thư mục | Vai trò | Domain logic |
 |---|---|---|---|
-| **Clarify** | [`clarify/`](file:///f:/AI_ML%20Projects/Deep%20Research/clarify) | Làm rõ mục tiêu nghiên cứu từ câu hỏi người dùng | — |
-| **Research Brief** | [`research_brief/`](file:///f:/AI_ML%20Projects/Deep%20Research/research_brief) | Sinh brief có cấu trúc (objective, sub_questions, constraints) | `validation.py` — `ResearchBrief` dataclass |
-| **Supervisor** | [`supervisor/`](file:///f:/AI_ML%20Projects/Deep%20Research/supervisor) | Điều phối vòng lặp nghiên cứu multi-round, quyết định sub-topics | `stopping_rules.py` — `should_force_stop()`, `LoopBudget` |
-| **Researcher** | [`researcher/`](file:///f:/AI_ML%20Projects/Deep%20Research/researcher) | Cào và tổng hợp dữ liệu web cho một sub-topic | — |
-| **Compression** | [`compression/`](file:///f:/AI_ML%20Projects/Deep%20Research/compression) | Nén findings giữa các round để giảm token | — |
-| **Verification** | [`verification/`](file:///f:/AI_ML%20Projects/Deep%20Research/verification) | Dual-Layer Citation Verifier + Source dedup | `dedup.py` — `Source`, `deduplicate_sources()` |
-| **Reporting** | [`reporting/`](file:///f:/AI_ML%20Projects/Deep%20Research/reporting) | Sinh báo cáo Markdown hoàn chỉnh với trích dẫn | `citation_registry.py` — `CitationRegistry` |
+| **Clarify** | [`clarify/`](../clarify) | Làm rõ mục tiêu nghiên cứu từ câu hỏi người dùng | — |
+| **Research Brief** | [`research_brief/`](../research_brief) | Sinh brief có cấu trúc (objective, sub_questions, constraints) | `validation.py` — `ResearchBrief` dataclass |
+| **Supervisor** | [`supervisor/`](../supervisor) | Điều phối vòng lặp nghiên cứu multi-round, quyết định sub-topics | `stopping_rules.py` — `should_force_stop()`, `LoopBudget` |
+| **Researcher** | [`researcher/`](../researcher) | Cào và tổng hợp dữ liệu web cho một sub-topic | — |
+| **Compression** | [`compression/`](../compression) | Nén findings giữa các round để giảm token | — |
+| **Verification** | [`verification/`](../verification) | Dual-Layer Citation Verifier + Source dedup | `dedup.py` — `Source`, `deduplicate_sources()` |
+| **Reporting** | [`reporting/`](../reporting) | Sinh báo cáo Markdown hoàn chỉnh với trích dẫn | `citation_registry.py` — `CitationRegistry` |
 
 ### Support Modules
 
 | Module | Thư mục | Vai trò |
 |---|---|---|
-| **State** | [`state/`](file:///f:/AI_ML%20Projects/Deep%20Research/state) | TypedDict schemas: `AgentState`, `SupervisorState`, `ResearcherState` |
-| **Caching** | [`caching/`](file:///f:/AI_ML%20Projects/Deep%20Research/caching) | Semantic cache fingerprint (version hash + dev-bypass) |
+| **State** | [`state/`](../state) | TypedDict schemas: `AgentState`, `SupervisorState`, `ResearcherState` |
+| **Caching** | [`caching/`](../caching) | Semantic cache fingerprint (version hash + dev-bypass) |
 
 ### Infrastructure (Humble Objects)
 
-Tất cả nằm trong [`infra/`](file:///f:/AI_ML%20Projects/Deep%20Research/infra). Mỗi file là một wrapper mỏng quanh I/O thật, đằng sau `typing.Protocol`.
+Tất cả nằm trong [`infra/`](../infra). Mỗi file là một wrapper mỏng quanh I/O thật, đằng sau `typing.Protocol`.
 
 | File | Chức năng |
 |---|---|
-| [`interfaces.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/interfaces.py) | `LLMProvider`, `SearchClient` Protocol — ranh giới Dependency Inversion |
-| [`model_router.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/model_router.py) | Cooldown `(provider, model)`, optional fallback chain, OpenAI-compatible + Anthropic protocols |
-| [`search_client.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/search_client.py) | Tavily wrapper, bóc tách `published_date` |
-| [`checkpointer.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/checkpointer.py) | PostgresSaver (Supabase) / InMemorySaver (dev) |
-| [`settings.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/settings.py) | Typed environment/runtime configuration |
-| [`bootstrap.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/bootstrap.py) | Composition root: settings → adapters → graph |
-| [`llm/factory.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/llm/factory.py) | JSON/environment provider factory for arbitrary models and endpoints |
-| [`rate_limiter.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/rate_limiter.py) | Optional token bucket rate limiter cho endpoint có quota |
-| [`temporal.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/temporal.py) | Temporal context — gắn năm hiện tại vào truy vấn thời sự |
-| [`tracing.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/tracing.py) | Langfuse callback setup |
-| [`ollama_manager.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/ollama_manager.py) | Zero-touch lifecycle cho Ollama + Local SLM |
+| [`interfaces.py`](../infra/interfaces.py) | `LLMProvider`, `SearchClient` Protocol — ranh giới Dependency Inversion |
+| [`model_router.py`](../infra/model_router.py) | Cooldown `(provider, model)`, optional fallback chain, OpenAI-compatible + Anthropic protocols |
+| [`search_client.py`](../infra/search_client.py) | Tavily wrapper, bóc tách `published_date` |
+| [`checkpointer.py`](../infra/checkpointer.py) | PostgresSaver (Supabase) / InMemorySaver (dev) |
+| [`settings.py`](../infra/settings.py) | Typed environment/runtime configuration |
+| [`bootstrap.py`](../infra/bootstrap.py) | Composition root: settings → adapters → graph |
+| [`llm/factory.py`](../infra/llm/factory.py) | JSON/environment provider factory for arbitrary models and endpoints |
+| [`rate_limiter.py`](../infra/rate_limiter.py) | Optional token bucket rate limiter cho endpoint có quota |
+| [`temporal.py`](../infra/temporal.py) | Temporal context — gắn năm hiện tại vào truy vấn thời sự |
+| [`tracing.py`](../infra/tracing.py) | Langfuse callback setup |
+| [`ollama_manager.py`](../infra/ollama_manager.py) | Zero-touch lifecycle cho Ollama + Local SLM |
 
 ### Harness Guard Layer
 
-Nằm trong [`infra/harness/`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/harness):
+Nằm trong [`infra/harness/`](../infra/harness):
 
 | File | Chức năng |
 |---|---|
-| [`protocol.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/harness/protocol.py) | Hermes SETP schema, `ResearchQueryAction`, `SupervisorDecision`, `ObservationSnippet` |
-| [`linter.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/harness/linter.py) | Pre-flight sanitizer + synthetic error reflection ($0 cost) |
-| [`observation_filter.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/harness/observation_filter.py) | Domain Authority Scorer (Tier A/B/C) + BM25 density filter |
-| [`convergence.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/harness/convergence.py) | Information Gain ΔI calculator + stagnation guard |
+| [`protocol.py`](../infra/harness/protocol.py) | Hermes SETP schema, `ResearchQueryAction`, `SupervisorDecision`, `ObservationSnippet` |
+| [`linter.py`](../infra/harness/linter.py) | Pre-flight sanitizer + synthetic error reflection ($0 cost) |
+| [`observation_filter.py`](../infra/harness/observation_filter.py) | Domain Authority Scorer (Tier A/B/C) + BM25 density filter |
+| [`convergence.py`](../infra/harness/convergence.py) | Information Gain ΔI calculator + stagnation guard |
 
 ---
 
 ## Graph Assembly
 
-[`graph.py`](file:///f:/AI_ML%20Projects/Deep%20Research/graph.py) là nơi **duy nhất** wiring toàn bộ LangGraph `StateGraph`. Nó:
+[`graph.py`](../graph.py) là nơi **duy nhất** wiring toàn bộ LangGraph `StateGraph`. Nó:
 
 1. Định nghĩa `ResearchGraphState` (mở rộng `AgentState` thêm `raw_findings`, `visited_urls`, `intent`, `cache_hit`)
 2. Tạo callback wrapper cho mỗi node
@@ -78,9 +78,9 @@ Nằm trong [`infra/harness/`](file:///f:/AI_ML%20Projects/Deep%20Research/infra
 4. Fan-out researcher qua `Send()` — số lượng = số sub-topic Supervisor quyết định
 5. Inject `checkpointer` khi compile
 
-**Tiered Hybrid Routing** được cấu hình tại đây:
-- `llm` (Cloud LLM) → supervisor, brief, reporting, verification
-- `worker_llm` (Local SLM) → researcher, compression
+**Runtime routing** được cấu hình tại đây:
+- `llm` → supervisor, brief, reporting, verification
+- `worker_llm` (tuỳ chọn) → researcher, compression khi người dùng bật local worker
 
 ---
 
@@ -132,7 +132,7 @@ dùng `protocol: "anthropic"`. Xem `config/providers.example.json`.
 
 ## Test Suite
 
-21 test files trong [`tests/`](file:///f:/AI_ML%20Projects/Deep%20Research/tests), tổng **140+ tests**, chạy bằng:
+21 test files trong [`tests/`](../tests), tổng **140+ tests**, chạy bằng:
 
 ```bash
 uv run pytest -v

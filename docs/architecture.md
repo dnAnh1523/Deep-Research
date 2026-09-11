@@ -11,8 +11,8 @@ Deep Research Agent là một hệ thống nghiên cứu tự động chạy tr�
 
 **Stack chính:**
 - **Orchestration:** LangGraph (Python)
-- **Cloud LLM:** Groq → Cerebras → OpenRouter (fallback chain)
-- **Local SLM:** Ollama + Qwen2.5-7B-Instruct (GGUF Q4_K_M) trên RTX 3050
+- **LLM:** Provider/model tuỳ ý qua `config/providers.json` hoặc environment
+- **Local SLM:** Ollama hoặc bất kỳ OpenAI-compatible local gateway nào
 - **Search:** Tavily (free tier)
 - **API:** FastAPI + SSE streaming
 - **Frontend:** Vite + React 19 + Tailwind CSS v4
@@ -155,11 +155,10 @@ Deep Research/
 │       ├── components/           # UI components (xem docs/frontend.md)
 │       ├── hooks/                # useResearchApi.ts — SSE + REST
 │       ├── types/                # TypeScript interfaces
-│       └── assets/               # Static assets
+│       └── public/               # Static assets
 │
 ├── tests/                        # 21 test files, 140+ tests
 ├── docs/                         # Tài liệu hệ thống
-├── .agents/                      # Antigravity rules & skills
 ├── run_demo.py                   # CLI runner (terminal demo)
 ├── run_fullstack.py              # Fullstack runner (API + Frontend)
 ├── .env                          # Environment variables (gitignored)
@@ -172,11 +171,11 @@ Deep Research/
 
 | Tầng | Scope | File |
 |---|---|---|
-| `AgentState` | Toàn flow — từ user query đến final report | [`state/schema.py`](file:///f:/AI_ML%20Projects/Deep%20Research/state/schema.py) |
-| `SupervisorState` | Điều phối — brief, notes, round counter | [`state/schema.py`](file:///f:/AI_ML%20Projects/Deep%20Research/state/schema.py) |
-| `ResearcherState` | Cô lập theo từng researcher — KHÔNG chia sẻ | [`state/schema.py`](file:///f:/AI_ML%20Projects/Deep%20Research/state/schema.py) |
+| `AgentState` | Toàn flow — từ user query đến final report | [`state/schema.py`](../state/schema.py) |
+| `SupervisorState` | Điều phối — brief, notes, round counter | [`state/schema.py`](../state/schema.py) |
+| `ResearcherState` | Cô lập theo từng researcher — KHÔNG chia sẻ | [`state/schema.py`](../state/schema.py) |
 
-`ResearchGraphState` (trong [`graph.py`](file:///f:/AI_ML%20Projects/Deep%20Research/graph.py)) mở rộng `AgentState` thêm `raw_findings`, `visited_urls`, `intent`, `cache_hit` — sử dụng `operator.add` reducer cho fan-in song song.
+`ResearchGraphState` (trong [`graph.py`](../graph.py)) mở rộng `AgentState` thêm `raw_findings`, `visited_urls`, `intent`, `cache_hit` — sử dụng `operator.add` reducer cho fan-in song song.
 
 ---
 
@@ -212,13 +211,17 @@ Deep Research/
 
 ---
 
-## Tiered Hybrid Model Routing
+## Model Routing
 
-| Vai trò | Model | Provider | Ghi chú |
-|---|---|---|---|
-| **Cloud LLM** (supervisor, brief, reporting) | `llama-3.3-70b-versatile` | Groq (primary) | Cooldown key = `(provider, model)` |
-| **Cloud Fallback** | `nvidia/nemotron-3-super-120b` | OpenRouter | Free tier ~50 req/ngày |
-| **Local SLM** (researcher, compression) | `qwen2.5-7b-instruct` Q4_K_M | Ollama (RTX 3050) | Zero-touch lifecycle qua `ollama_manager.py` |
+The runtime does not require a specific provider or model. Configure one or
+more primary entries and an optional fallback in `config/providers.json`.
+Cloud, local, hosted Ollama, Anthropic-native, and OpenAI-compatible gateways
+can be mixed as long as the selected models support the capabilities required
+by the pipeline. The cooldown key is `(provider, model)`.
+
+The optional local worker path can route researcher/compression work through
+Ollama or another local OpenAI-compatible gateway; it is disabled unless
+explicitly configured.
 
 ---
 
@@ -233,18 +236,18 @@ Nằm giữa Node Functions và hạ tầng bên ngoài, tổng hợp từ Herme
 | **Observation Density Filter** | BM25 top-3 đoạn giàu dữ liệu nhất cho Local SLM |
 | **Convergence ΔI Guard** | Đo bão hòa tri thức, tự dừng khi ΔI < threshold |
 
-Chi tiết đặc tả toán học: [`docs/harness-architecture-research.md`](file:///f:/AI_ML%20Projects/Deep%20Research/docs/harness-architecture-research.md)
+Các guard của harness được triển khai trong thư mục [`infra/harness/`](../infra/harness/). Ghi chú thiết kế nội bộ không nằm trong bản phát hành public.
 
 ---
 
 ## Temporal Grounding
 
-[`infra/temporal.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/temporal.py) tự động gắn mốc thời sự (năm hiện tại) vào truy vấn chứa từ khóa thời sự ("mới nhất", "hiện nay", "gần đây"), ngăn model trả lời bằng dữ liệu cũ trong training data.
+[`infra/temporal.py`](../infra/temporal.py) tự động gắn mốc thời sự (năm hiện tại) vào truy vấn chứa từ khóa thời sự ("mới nhất", "hiện nay", "gần đây"), ngăn model trả lời bằng dữ liệu cũ trong training data.
 
 ---
 
 ## Observability
 
-- **Langfuse tracing** ([`infra/tracing.py`](file:///f:/AI_ML%20Projects/Deep%20Research/infra/tracing.py)): Bật từ đầu, không để tới lúc debug mới thêm.
+- **Langfuse tracing** ([`infra/tracing.py`](../infra/tracing.py)): Bật từ đầu, không để tới lúc debug mới thêm.
 - **Pay-as-you-go cost tracking**: Mỗi LLM call ghi `latency_seconds` + `cost_usd` từ pricing catalog trong Model Router.
 - **XAI Glass-Box logging**: Log từng quyết định của Supervisor, Researcher, Harness cho phép audit hậu kiểm.

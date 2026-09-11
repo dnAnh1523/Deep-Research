@@ -10,7 +10,6 @@ Acceptance criteria:
 import asyncio
 import json
 import logging
-import os
 import re
 import uuid
 from typing import Any, AsyncGenerator
@@ -237,12 +236,9 @@ def create_app(
     @app.get("/api/latest-report")
     async def get_latest_report() -> dict[str, Any]:
         """Fetch the latest research report and structured citations from disk."""
-        report_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "latest_report.md",
-        )
-        if os.path.exists(report_path):
-            with open(report_path, "r", encoding="utf-8") as f:
+        report_path = settings.resolve_path(settings.report_storage_dir) / "latest_report.md"
+        if report_path.exists():
+            with report_path.open("r", encoding="utf-8") as f:
                 content = f.read()
 
             from reporting.citation_registry import parse_sources_from_research_notes

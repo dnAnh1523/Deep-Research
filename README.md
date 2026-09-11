@@ -57,9 +57,11 @@ copy .env.example .env       # Windows
 copy config/providers.example.json config/providers.json
 ```
 
-Edit `config/providers.json` and set the `api_key_env` values in `.env`. At
-least one configured LLM and `TAVILY_API_KEY` are needed for a real research
-run. You may omit Tavily while working on the UI or using the mocked tests.
+Edit `config/providers.json` and `.env`. Keep only the provider entries you
+actually want to use; the example intentionally contains one generic entry so
+an unconfigured provider is never retried accidentally. At least one
+configured LLM and `TAVILY_API_KEY` are needed for a real research run. You
+may omit Tavily while working on the UI or using the mocked tests.
 
 Start the API:
 
@@ -167,11 +169,11 @@ access.
 After reviewing the asset licenses and adding your remote repository:
 
 ```bash
-git init -b main
+git init -b master
 git add .
 git commit -m "Prepare open-source release"
 git remote add origin https://github.com/<owner>/<repository>.git
-git push -u origin main
+git push -u origin master
 ```
 
 Run `git diff --cached` before the first commit and confirm that `.env`, local

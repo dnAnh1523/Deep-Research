@@ -71,20 +71,20 @@ Khi stream kết thúc:
 
 ## Components chi tiết
 
-### [`App.tsx`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/App.tsx)
+### [`App.tsx`](../frontend/src/App.tsx)
 
 Root component quản lý toàn bộ state:
 - `sessions` (persist vào `localStorage`)
 - `messages`, `currentPlan`, `status`, `thoughtSteps`, `webSources`, `report`, `citations`
 - `isCanvasOpen`, `canvasMode` ('progress' | 'report')
 
-### [`Sidebar.tsx`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/components/Sidebar.tsx)
+### [`Sidebar.tsx`](../frontend/src/components/Sidebar.tsx)
 
 - Nút `+ Cuộc trò chuyện mới`
 - Danh sách phiên nghiên cứu gần đây
 - Collapsible (toggle via hamburger button)
 
-### [`ChatFeed.tsx`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/components/ChatFeed.tsx)
+### [`ChatFeed.tsx`](../frontend/src/components/ChatFeed.tsx)
 
 - Render danh sách `ChatMessage[]`
 - Nhận diện `message.type` để render đúng component:
@@ -94,38 +94,38 @@ Root component quản lý toàn bộ state:
   - default → Bong bóng text
 - Input bar nằm dưới đáy
 
-### [`ResearchPlanCard.tsx`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/components/ResearchPlanCard.tsx)
+### [`ResearchPlanCard.tsx`](../frontend/src/components/ResearchPlanCard.tsx)
 
 - Tiêu đề nghiên cứu
 - Danh sách bước (expandable)
 - Thời gian ước tính
 - 2 nút: `[Chỉnh sửa kế hoạch]` + `[Bắt đầu nghiên cứu]`
 
-### [`ResearchCanvas.tsx`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/components/ResearchCanvas.tsx)
+### [`ResearchCanvas.tsx`](../frontend/src/components/ResearchCanvas.tsx)
 
 Side panel cố định (50-56% màn hình), bo tròn (`rounded-3xl`), floating card design:
 - **mode = 'progress'**: Header + `CanvasThoughtStream`
 - **mode = 'report'**: `CanvasReportViewer`
 
-### [`CanvasThoughtStream.tsx`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/components/CanvasThoughtStream.tsx)
+### [`CanvasThoughtStream.tsx`](../frontend/src/components/CanvasThoughtStream.tsx)
 
 - Render danh sách `ThoughtStep[]` với icon Sparkle
 - Render `WebSourceChip[]` dạng capsule pills (domain name)
 - Skeleton bars khi `isStreaming`
 
-### [`CanvasReportViewer.tsx`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/components/CanvasReportViewer.tsx)
+### [`CanvasReportViewer.tsx`](../frontend/src/components/CanvasReportViewer.tsx)
 
 - Header: Tiêu đề + Mục lục dropdown + Chia sẻ/Xuất + Nút đóng
 - Body: `ReadingCanvas` (Markdown rendering)
 - Footer: 3 accordion sections
 
-### [`ReadingCanvas.tsx`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/components/ReadingCanvas.tsx)
+### [`ReadingCanvas.tsx`](../frontend/src/components/ReadingCanvas.tsx)
 
 - Markdown → HTML via `marked`
 - Custom renderer cho tables, headings (auto-generate `id`)
 - Superscript citations `[1]` hover → `CitationPopover`
 
-### [`CitationPopover.tsx`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/components/CitationPopover.tsx)
+### [`CitationPopover.tsx`](../frontend/src/components/CitationPopover.tsx)
 
 - Hover-triggered (không phải click)
 - Giữ mở khi chuột ở trong popover
@@ -135,7 +135,7 @@ Side panel cố định (50-56% màn hình), bo tròn (`rounded-3xl`), floating 
 
 ## SSE Integration
 
-### [`hooks/useResearchApi.ts`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/hooks/useResearchApi.ts)
+### [`hooks/useResearchApi.ts`](../frontend/src/hooks/useResearchApi.ts)
 
 Cung cấp 2 hàm chính:
 
@@ -157,7 +157,7 @@ Cung cấp 2 hàm chính:
 
 ## Type System
 
-[`types/research.ts`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/types/research.ts) định nghĩa:
+[`types/research.ts`](../frontend/src/types/research.ts) định nghĩa:
 
 | Interface | Mục đích |
 |---|---|
@@ -173,7 +173,7 @@ Cung cấp 2 hàm chính:
 
 ## Styling
 
-### Theme tokens ([`index.css`](file:///f:/AI_ML%20Projects/Deep%20Research/frontend/src/index.css))
+### Theme tokens ([`index.css`](../frontend/src/index.css))
 
 Dark-mode only. CSS custom properties:
 - **Surfaces**: `--surface-ground` (#0f0f0f), `--surface-card` (#171717), `--surface-elevated` (#1f1f1f)

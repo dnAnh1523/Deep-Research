@@ -147,3 +147,23 @@ def test_get_latest_report_endpoint():
                 assert len(data["report"]) > 0
 
     asyncio.run(run())
+
+
+def test_get_latest_report_uses_configured_storage_dir(monkeypatch, tmp_path):
+    """The compatibility endpoint follows REPORT_STORAGE_DIR instead of repo root."""
+    report_path = tmp_path / "latest_report.md"
+    report_path.write_text("# Stored report\n\nSource [1](https://example.com)", encoding="utf-8")
+    monkeypatch.setenv("REPORT_STORAGE_DIR", str(tmp_path))
+
+    async def run():
+        app = create_app()
+        transport = httpx.ASGITransport(app=app)
+
+        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+            res = await client.get("/api/latest-report")
+            assert res.status_code == 200
+            data = res.json()
+            assert data["status"] == "available"
+            assert data["report"].startswith("# Stored report")
+
+    asyncio.run(run())

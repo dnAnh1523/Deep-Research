@@ -264,8 +264,10 @@ async def main() -> None:
                 telemetry["by_model"][mod]["cost_usd"] = round(telemetry["by_model"][mod]["cost_usd"] + stats["cost_usd"], 6)
 
     if final_report:
-        output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "latest_report.md")
-        with open(output_path, "w", encoding="utf-8") as f:
+        output_dir = settings.resolve_path(settings.report_storage_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = output_dir / "latest_report.md"
+        with output_path.open("w", encoding="utf-8") as f:
             f.write(final_report)
         print(f"\n💾 Đã tự động lưu bài báo cáo đầy đủ vào: {output_path}", flush=True)
 
