@@ -174,9 +174,9 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({
                           <div className="text-xs font-semibold text-[var(--text-display)]">
                             {currentPlan?.title || 'Đang nghiên cứu trang web'}
                           </div>
-                            <div className="text-[11px] text-[#e6e6e6]/60">
+                          <div className="text-[11px] text-[#e6e6e6]/60">
                             {status === 'researching'
-                              ? `Đang nghiên cứu ${webSourcesCount > 0 ? webSourcesCount : 10}+ trang web...`
+                              ? (webSourcesCount > 0 ? `Đang nghiên cứu ${webSourcesCount} trang web...` : 'Đang chuẩn bị các truy vấn tìm kiếm...')
                               : 'Bấm để mở thẻ Canvas'}
                           </div>
                         </div>
@@ -199,8 +199,10 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({
                           <div className="text-xs font-semibold text-[var(--text-display)]">
                             {currentPlan?.title || 'Báo cáo hoàn tất'}
                           </div>
-                            <div className="text-[11px] text-[#e6e6e6]/60">
-                            Bấm để xem báo cáo trong thẻ Canvas
+                          <div className="text-[11px] text-[#e6e6e6]/60">
+                            {webSourcesCount > 0
+                              ? `Đã nghiên cứu ${webSourcesCount} trang web • Bấm để xem báo cáo`
+                              : 'Bấm để mở báo cáo đầy đủ'}
                           </div>
                         </div>
                       </div>

@@ -1,4 +1,4 @@
-import { Compass, MessageSquare, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Compass, MessageSquare, PanelLeftClose, PanelLeftOpen, Trash2 } from 'lucide-react';
 import type { ResearchSession } from '../types/research';
 
 interface SidebarProps {
@@ -6,7 +6,9 @@ interface SidebarProps {
   onToggle: () => void;
   sessions: ResearchSession[];
   currentSessionId: string | null;
+  isCurrentSessionStreaming: boolean;
   onSelectSession: (id: string) => void;
+  onDeleteSession: (id: string) => void;
   onNewSession: () => void;
 }
 
@@ -15,7 +17,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggle,
   sessions,
   currentSessionId,
+  isCurrentSessionStreaming,
   onSelectSession,
+  onDeleteSession,
   onNewSession,
 }) => {
   return (
@@ -73,24 +77,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
             ) : (
               sessions.map((session) => {
                 const isActive = session.id === currentSessionId;
+                const isBusy = isActive && isCurrentSessionStreaming;
                 return (
-                  <button
+                  <div
                     key={session.id}
-                    type="button"
-                    aria-current={isActive ? 'page' : undefined}
-                    onClick={() => onSelectSession(session.id)}
-                    className={`group flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-xs transition-colors ${
-                      isActive
-                        ? 'bg-[#1f1f1f] font-medium text-[#e6e6e6]'
-                        : 'text-white/55 hover:text-[#e6e6e6]'
+                    className={`group flex w-full items-center rounded-lg text-xs transition-colors ${
+                      isActive ? 'bg-[#1f1f1f] font-medium text-[#e6e6e6]' : 'text-white/55'
                     }`}
                   >
-                    <MessageSquare className="h-3.5 w-3.5 shrink-0 text-current" />
-                    <span className="min-w-0 flex-1 truncate">{session.title || 'Chủ đề nghiên cứu'}</span>
-                    {session.status === 'researching' && (
-                      <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[#1f3b9b]" />
-                    )}
-                  </button>
+                    <button
+                      type="button"
+                      aria-current={isActive ? 'page' : undefined}
+                      onClick={() => onSelectSession(session.id)}
+                      className="flex min-w-0 flex-1 items-center gap-2.5 px-3 py-2.5 text-left transition-colors hover:text-[#e6e6e6]"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 shrink-0 text-current" />
+                      <span className="min-w-0 flex-1 truncate">{session.title || 'Chủ đề nghiên cứu'}</span>
+                      {isBusy && (
+                        <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[#1f3b9b]" />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteSession(session.id)}
+                      disabled={isBusy}
+                      title={isBusy ? 'Nghiên cứu đang chạy' : 'Xóa nghiên cứu'}
+                      aria-label={isBusy ? 'Nghiên cứu đang chạy' : `Xóa ${session.title || 'nghiên cứu'}`}
+                      className="mr-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-white/30 opacity-0 transition-[opacity,color] hover:text-[#e6e6e6] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-25"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 );
               })
             )}

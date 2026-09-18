@@ -6,7 +6,11 @@ from unittest.mock import AsyncMock, patch
 
 import httpx
 
-from infra.llm.factory import load_provider_config
+from infra.llm.factory import (
+    build_model_routers,
+    load_provider_config,
+    load_role_provider_configs,
+)
 from infra.model_router import ModelRouter, ProviderConfig
 from infra.settings import AppSettings
 
@@ -72,6 +76,58 @@ def test_load_provider_config_supports_native_anthropic_protocol(tmp_path):
 
     assert primary[0].protocol == "anthropic"
     assert primary[0].api_key == "test-secret"
+
+
+def test_load_provider_config_supports_brain_and_worker_roles(tmp_path):
+    config_path = tmp_path / "providers.json"
+    config_path.write_text(
+        json.dumps(
+            {
+                "roles": {
+                    "brain": {
+                        "primary": [
+                            {
+                                "provider": "ollama",
+                                "model": "gpt-oss:120b",
+                                "base_url": "https://ollama.test/v1",
+                                "api_key_env": "OLLAMA_API_KEY",
+                                "extra_params": {"reasoning_effort": "low"},
+                            }
+                        ],
+                        "fallback": None,
+                    },
+                    "worker": {
+                        "primary": [
+                            {
+                                "provider": "ollama",
+                                "model": "gpt-oss:20b",
+                                "base_url": "https://ollama.test/v1",
+                                "api_key_env": "OLLAMA_API_KEY",
+                            }
+                        ],
+                        "fallback": None,
+                    },
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    settings = AppSettings(provider_config_file=str(config_path))
+    roles = load_role_provider_configs(
+        settings,
+        environ={"OLLAMA_API_KEY": "test-secret"},
+    )
+
+    assert roles["brain"][0][0].model == "gpt-oss:120b"
+    assert roles["brain"][0][0].extra_params == {"reasoning_effort": "low"}
+    assert roles["worker"][0][0].model == "gpt-oss:20b"
+
+    brain_router, worker_router = build_model_routers(settings, environ={"OLLAMA_API_KEY": "test-secret"})
+    assert brain_router is not None
+    assert worker_router is not None
+    assert brain_router.providers[0].model == "gpt-oss:120b"
+    assert worker_router.providers[0].model == "gpt-oss:20b"
 
 
 def test_model_router_translates_anthropic_messages_and_tools():

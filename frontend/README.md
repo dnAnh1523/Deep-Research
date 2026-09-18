@@ -11,6 +11,6 @@ npm run lint
 npm run build
 ```
 
-The production image is built from this directory and served by Nginx. Keep
+The container image is built from this directory and served by Nginx. Keep
 provider credentials in the backend environment; Vite variables are public and
 must never contain API keys.

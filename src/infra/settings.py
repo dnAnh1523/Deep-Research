@@ -50,7 +50,7 @@ class AppSettings:
     @classmethod
     def from_env(cls, *, root_dir: str | Path | None = None) -> "AppSettings":
         """Load `.env` from the repository root without printing any secrets."""
-        root = Path(root_dir) if root_dir else Path(__file__).resolve().parents[1]
+        root = Path(root_dir) if root_dir else Path(__file__).resolve().parents[2]
         load_dotenv(dotenv_path=root / ".env", override=False)
 
         database_url = os.getenv("DATABASE_URL") or os.getenv("SUPABASE_DATABASE_URL")
@@ -86,4 +86,4 @@ class AppSettings:
         path = Path(value)
         if path.is_absolute():
             return path
-        return Path(__file__).resolve().parents[1] / path
+        return Path(__file__).resolve().parents[2] / path

@@ -12,7 +12,7 @@ from typing import Any
 
 from graph import build_research_graph
 from infra.checkpointer import get_checkpointer
-from infra.llm.factory import build_model_router
+from infra.llm.factory import build_model_routers
 from infra.search_client import TavilySearchClient
 from infra.settings import AppSettings
 from supervisor.concurrency_gate import ConcurrencyGate
@@ -21,6 +21,7 @@ from supervisor.concurrency_gate import ConcurrencyGate
 @dataclass(frozen=True)
 class RuntimeComponents:
     llm: Any
+    worker_llm: Any
     search_client: Any
     checkpointer: Any
     graph: Any
@@ -32,7 +33,7 @@ def build_runtime(settings: AppSettings | None = None) -> RuntimeComponents | No
     if active_settings.search_provider != "tavily" or not active_settings.tavily_api_key:
         return None
 
-    llm = build_model_router(active_settings)
+    llm, worker_llm = build_model_routers(active_settings)
     if llm is None:
         return None
 
@@ -40,6 +41,7 @@ def build_runtime(settings: AppSettings | None = None) -> RuntimeComponents | No
     checkpointer = get_checkpointer()
     graph = build_research_graph(
         llm=llm,
+        worker_llm=worker_llm,
         search_client=search_client,
         concurrency_gate=ConcurrencyGate(
             max_concurrent=active_settings.max_concurrent_researchers
@@ -48,6 +50,7 @@ def build_runtime(settings: AppSettings | None = None) -> RuntimeComponents | No
     )
     return RuntimeComponents(
         llm=llm,
+        worker_llm=worker_llm,
         search_client=search_client,
         checkpointer=checkpointer,
         graph=graph,

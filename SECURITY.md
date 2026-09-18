@@ -7,7 +7,7 @@ When self-hosting:
 
 - keep the backend behind HTTPS and an authentication/rate-limit layer;
 - never expose provider keys to the browser;
-- use a production PostgreSQL checkpointer instead of in-memory state;
+- use a persistent PostgreSQL checkpointer instead of in-memory state when persistence is needed;
 - rotate any key that appears in logs, screenshots, commits, or crash reports.
 
 This project is a self-hosted reference application and does not provide a

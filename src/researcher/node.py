@@ -105,12 +105,19 @@ Respond in the language of the assigned sub-topic.
             for r in search_results
         )
 
+    sources = [
+        {"url": r.url, "title": getattr(r, "title", "")}
+        for r in search_results
+        if hasattr(r, "url") and r.url
+    ]
+
     return {
         "topic": topic,
         "findings": findings,
         "tool_calls_made": tool_calls_made,
         "status": "complete",
         "visited_urls": visited_urls,
+        "sources": sources,
     }
 
 

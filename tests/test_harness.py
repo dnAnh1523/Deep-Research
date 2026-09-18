@@ -104,7 +104,7 @@ def test_sanitize_aspect_query_removes_meta_patterns():
         ("QUERIES: - DeepSeek-R1 latency benchmarks", "DeepSeek-R1 latency benchmarks"),
         ("4. QUERIES: Lãi suất mua nhà 2026", "Lãi suất mua nhà 2026"),
         ("GAP: 1) Cần bổ sung số liệu GDP vĩ mô:", "Cần bổ sung số liệu GDP vĩ mô"),
-        ("- **Tìm kiếm:** So sánh hiệu năng RTX 3050 và RTX 4060", "So sánh hiệu năng RTX 3050 và RTX 4060"),
+        ("- **Tìm kiếm:** So sánh hiệu năng RTX 4070 và RTX 4090", "So sánh hiệu năng RTX 4070 và RTX 4090"),
         ("Câu hỏi nghiên cứu: Quy chuẩn xây dựng chung cư;", "Quy chuẩn xây dựng chung cư"),
         ('"[Query] Tác động chính sách tiền tệ"', "Tác động chính sách tiền tệ"),
         ("Sub-question 2: Phân tích tỷ lệ thất nghiệp", "Phân tích tỷ lệ thất nghiệp"),
@@ -367,9 +367,9 @@ def test_supervisor_node_with_hermes_xml_integration():
             "{\n"
             '  "name": "delegate_research_queries",\n'
             '  "arguments": {\n'
-            '    "gap_analysis": "Missing benchmark for RTX 3050 8GB VRAM",\n'
+            '    "gap_analysis": "Missing benchmark for RTX 4070 12GB VRAM",\n'
             '    "queries": [\n'
-            '      {"subject_anchor": "Qwen2.5-7B-Instruct", "technical_aspect": "RTX 3050 GGUF Q4_K_M tokens per second", "target_tier": "tier_a"}\n'
+            '      {"subject_anchor": "Qwen2.5-7B-Instruct", "technical_aspect": "RTX 4070 GGUF Q4_K_M tokens per second", "target_tier": "tier_a"}\n'
             "    ]\n"
             "  }\n"
             "}\n"
@@ -378,7 +378,7 @@ def test_supervisor_node_with_hermes_xml_integration():
         llm = MockLLM(hermes_xml_reply)
         state: AgentState = {
             "thread_id": "t1",
-            "user_query": "Đo hiệu năng SLM trên RTX 3050",
+            "user_query": "Đo hiệu năng SLM trên RTX 4070",
             "clarification_history": [],
             "supervisor": {
                 "brief": None,
@@ -398,7 +398,7 @@ def test_supervisor_node_with_hermes_xml_integration():
         assert "follow_up_queries" in sup
         assert len(sup["follow_up_queries"]) == 1
         query = sup["follow_up_queries"][0]
-        assert "Qwen2.5-7B-Instruct RTX 3050 GGUF Q4_K_M" in query
+        assert "Qwen2.5-7B-Instruct RTX 4070 GGUF Q4_K_M" in query
         assert "QUERIES:" not in query
         assert "<thought>" in llm.last_prompt or "<tools>" in llm.last_prompt
 
@@ -452,10 +452,12 @@ def test_researcher_node_drops_tier_c_and_condenses_observations():
 
 def test_clean_architecture_boundaries_infra_harness():
     """Verify infra/harness/ does NOT import LangGraph, external SDKs, or network libraries."""
-    harness_dir = Path(__file__).resolve().parent.parent / "infra" / "harness"
+    harness_dir = Path(__file__).resolve().parent.parent / "src" / "infra" / "harness"
     forbidden_modules = {"langgraph", "groq", "litellm", "tavily", "fastapi", "requests", "urllib.request", "httpx"}
 
-    for py_file in harness_dir.glob("*.py"):
+    py_files = list(harness_dir.glob("*.py"))
+    assert len(py_files) > 0, "No harness python files found to test"
+    for py_file in py_files:
         tree = ast.parse(py_file.read_text(encoding="utf-8"), filename=str(py_file))
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):

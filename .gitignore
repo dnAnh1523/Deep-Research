@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 *.so
 .pytest_cache/
+.pytest_temp/
 .ruff_cache/
 .mypy_cache/
 *.egg-info/
@@ -37,6 +38,7 @@ frontend/node_modules/
 # Research output (generated, not source)
 latest_report.md
 data/reports/
+brag-output/
 
 # Local provider configuration may contain private endpoint metadata
 config/providers.json

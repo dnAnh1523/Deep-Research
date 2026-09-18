@@ -8,9 +8,7 @@
 
 | File | Mục đích | Lệnh |
 |---|---|---|
-| [`run_demo.py`](../run_demo.py) | CLI runner — chạy pipeline đầy đủ từ terminal, xuất báo cáo vào `REPORT_STORAGE_DIR` | `python run_demo.py` |
-| [`run_fullstack.py`](../run_fullstack.py) | Fullstack runner — khởi động Backend (port 8000) + Frontend (port 3000) đồng thời | `python run_fullstack.py` |
-| [`api/app.py`](../api/app.py) | FastAPI server — REST + SSE endpoints | `uvicorn api.app:app --port 8000` |
+| [`src/api/app.py`](../src/api/app.py) | FastAPI server — REST + SSE endpoints | `uvicorn api.app:create_app --factory --app-dir src --port 8000` |
 
 ---
 
@@ -22,55 +20,55 @@ Mỗi module chứa `node.py` (LangGraph node function) và có thể chứa dom
 
 | Module | Thư mục | Vai trò | Domain logic |
 |---|---|---|---|
-| **Clarify** | [`clarify/`](../clarify) | Làm rõ mục tiêu nghiên cứu từ câu hỏi người dùng | — |
-| **Research Brief** | [`research_brief/`](../research_brief) | Sinh brief có cấu trúc (objective, sub_questions, constraints) | `validation.py` — `ResearchBrief` dataclass |
-| **Supervisor** | [`supervisor/`](../supervisor) | Điều phối vòng lặp nghiên cứu multi-round, quyết định sub-topics | `stopping_rules.py` — `should_force_stop()`, `LoopBudget` |
-| **Researcher** | [`researcher/`](../researcher) | Cào và tổng hợp dữ liệu web cho một sub-topic | — |
-| **Compression** | [`compression/`](../compression) | Nén findings giữa các round để giảm token | — |
-| **Verification** | [`verification/`](../verification) | Dual-Layer Citation Verifier + Source dedup | `dedup.py` — `Source`, `deduplicate_sources()` |
-| **Reporting** | [`reporting/`](../reporting) | Sinh báo cáo Markdown hoàn chỉnh với trích dẫn | `citation_registry.py` — `CitationRegistry` |
+| **Clarify** | [`src/clarify/`](../src/clarify) | Làm rõ mục tiêu nghiên cứu từ câu hỏi người dùng | — |
+| **Research Brief** | [`src/research_brief/`](../src/research_brief) | Sinh brief có cấu trúc (objective, sub_questions, constraints) | `validation.py` — `ResearchBrief` dataclass |
+| **Supervisor** | [`src/supervisor/`](../src/supervisor) | Điều phối vòng lặp nghiên cứu multi-round, quyết định sub-topics | `stopping_rules.py` — `should_force_stop()`, `LoopBudget` |
+| **Researcher** | [`src/researcher/`](../src/researcher) | Cào và tổng hợp dữ liệu web cho một sub-topic | — |
+| **Compression** | [`src/compression/`](../src/compression) | Nén findings giữa các round để giảm token | — |
+| **Verification** | [`src/verification/`](../src/verification) | Dual-Layer Citation Verifier + Source dedup | `dedup.py` — `Source`, `deduplicate_sources()` |
+| **Reporting** | [`src/reporting/`](../src/reporting) | Sinh báo cáo Markdown hoàn chỉnh với trích dẫn | `citation_registry.py` — `CitationRegistry` |
 
 ### Support Modules
 
 | Module | Thư mục | Vai trò |
 |---|---|---|
-| **State** | [`state/`](../state) | TypedDict schemas: `AgentState`, `SupervisorState`, `ResearcherState` |
-| **Caching** | [`caching/`](../caching) | Semantic cache fingerprint (version hash + dev-bypass) |
+| **State** | [`src/state/`](../src/state) | TypedDict schemas: `AgentState`, `SupervisorState`, `ResearcherState` |
+| **Caching** | [`src/caching/`](../src/caching) | Semantic cache fingerprint (version hash + dev-bypass) |
 
 ### Infrastructure (Humble Objects)
 
-Tất cả nằm trong [`infra/`](../infra). Mỗi file là một wrapper mỏng quanh I/O thật, đằng sau `typing.Protocol`.
+Tất cả nằm trong [`src/infra/`](../src/infra). Mỗi file là một wrapper mỏng quanh I/O thật, đằng sau `typing.Protocol`.
 
 | File | Chức năng |
 |---|---|
-| [`interfaces.py`](../infra/interfaces.py) | `LLMProvider`, `SearchClient` Protocol — ranh giới Dependency Inversion |
-| [`model_router.py`](../infra/model_router.py) | Cooldown `(provider, model)`, optional fallback chain, OpenAI-compatible + Anthropic protocols |
-| [`search_client.py`](../infra/search_client.py) | Tavily wrapper, bóc tách `published_date` |
-| [`checkpointer.py`](../infra/checkpointer.py) | PostgresSaver (Supabase) / InMemorySaver (dev) |
-| [`settings.py`](../infra/settings.py) | Typed environment/runtime configuration |
-| [`bootstrap.py`](../infra/bootstrap.py) | Composition root: settings → adapters → graph |
-| [`llm/factory.py`](../infra/llm/factory.py) | JSON/environment provider factory for arbitrary models and endpoints |
-| [`rate_limiter.py`](../infra/rate_limiter.py) | Optional token bucket rate limiter cho endpoint có quota |
-| [`temporal.py`](../infra/temporal.py) | Temporal context — gắn năm hiện tại vào truy vấn thời sự |
-| [`tracing.py`](../infra/tracing.py) | Langfuse callback setup |
-| [`ollama_manager.py`](../infra/ollama_manager.py) | Zero-touch lifecycle cho Ollama + Local SLM |
+| [`interfaces.py`](../src/infra/interfaces.py) | `LLMProvider`, `SearchClient` Protocol — ranh giới Dependency Inversion |
+| [`model_router.py`](../src/infra/model_router.py) | Cooldown `(provider, model)`, optional fallback chain, OpenAI-compatible + Anthropic protocols |
+| [`search_client.py`](../src/infra/search_client.py) | Tavily wrapper, bóc tách `published_date` |
+| [`checkpointer.py`](../src/infra/checkpointer.py) | PostgresSaver (Supabase) / InMemorySaver (dev) |
+| [`settings.py`](../src/infra/settings.py) | Typed environment/runtime configuration |
+| [`bootstrap.py`](../src/infra/bootstrap.py) | Composition root: settings → adapters → graph |
+| [`llm/factory.py`](../src/infra/llm/factory.py) | JSON/environment provider factory for arbitrary models and endpoints |
+| [`rate_limiter.py`](../src/infra/rate_limiter.py) | Optional token bucket rate limiter cho endpoint có quota |
+| [`temporal.py`](../src/infra/temporal.py) | Temporal context — gắn năm hiện tại vào truy vấn thời sự |
+| [`tracing.py`](../src/infra/tracing.py) | Langfuse callback setup |
+| [`ollama_manager.py`](../src/infra/ollama_manager.py) | Zero-touch lifecycle cho Ollama + Local SLM |
 
 ### Harness Guard Layer
 
-Nằm trong [`infra/harness/`](../infra/harness):
+Nằm trong [`src/infra/harness/`](../src/infra/harness):
 
 | File | Chức năng |
 |---|---|
-| [`protocol.py`](../infra/harness/protocol.py) | Hermes SETP schema, `ResearchQueryAction`, `SupervisorDecision`, `ObservationSnippet` |
-| [`linter.py`](../infra/harness/linter.py) | Pre-flight sanitizer + synthetic error reflection ($0 cost) |
-| [`observation_filter.py`](../infra/harness/observation_filter.py) | Domain Authority Scorer (Tier A/B/C) + BM25 density filter |
-| [`convergence.py`](../infra/harness/convergence.py) | Information Gain ΔI calculator + stagnation guard |
+| [`protocol.py`](../src/infra/harness/protocol.py) | Hermes SETP schema, `ResearchQueryAction`, `SupervisorDecision`, `ObservationSnippet` |
+| [`linter.py`](../src/infra/harness/linter.py) | Pre-flight sanitizer + synthetic error reflection ($0 cost) |
+| [`observation_filter.py`](../src/infra/harness/observation_filter.py) | Domain Authority Scorer (Tier A/B/C) + BM25 density filter |
+| [`convergence.py`](../src/infra/harness/convergence.py) | Information Gain ΔI calculator + stagnation guard |
 
 ---
 
 ## Graph Assembly
 
-[`graph.py`](../graph.py) là nơi **duy nhất** wiring toàn bộ LangGraph `StateGraph`. Nó:
+[`src/graph.py`](../src/graph.py) là nơi **duy nhất** wiring toàn bộ LangGraph `StateGraph`. Nó:
 
 1. Định nghĩa `ResearchGraphState` (mở rộng `AgentState` thêm `raw_findings`, `visited_urls`, `intent`, `cache_hit`)
 2. Tạo callback wrapper cho mỗi node
@@ -79,8 +77,11 @@ Nằm trong [`infra/harness/`](../infra/harness):
 5. Inject `checkpointer` khi compile
 
 **Runtime routing** được cấu hình tại đây:
-- `llm` → supervisor, brief, reporting, verification
-- `worker_llm` (tuỳ chọn) → researcher, compression khi người dùng bật local worker
+- `llm` / `brain` role → clarify, brief, supervisor, reporting, verification
+- `worker_llm` / `worker` role → researcher và compression chạy song song
+
+Hai role được cấu hình trong `config/providers.json`. Nếu không khai báo
+`roles`, provider legacy ở top-level sẽ được dùng cho cả hai role.
 
 ---
 
@@ -121,7 +122,7 @@ Cấu hình qua `.env` (xem `.env.example`):
 | `PROVIDER_CONFIG_FILE` | Có cho cấu hình tuỳ ý | JSON mô tả provider/model, base URL, protocol và tên biến key |
 | `TAVILY_API_KEY` | Có cho research web | API key Tavily search |
 | `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / provider keys | Tuỳ cấu hình | Các key được tham chiếu server-side từ `.env` |
-| `DATABASE_URL` | Có khi `ENV=prod` | PostgresSaver cho checkpointer |
+| `DATABASE_URL` | Tuỳ chọn | PostgresSaver cho persistent checkpointer (mặc định dùng InMemorySaver) |
 | `LANGFUSE_*` | Không | Tracing credentials |
 
 Không có provider/model bắt buộc trong code. OpenAI-compatible gateway, Ollama

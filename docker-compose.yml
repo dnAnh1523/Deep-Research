@@ -6,7 +6,6 @@ services:
     env_file:
       - .env
     environment:
-      ENV: prod
       API_HOST: 0.0.0.0
       DATABASE_URL: postgresql://deepresearch:deepresearch@postgres:5432/deepresearch
       CORS_ORIGINS: http://localhost:3000

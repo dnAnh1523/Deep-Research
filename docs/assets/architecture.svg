@@ -1,0 +1,392 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="diagramTitle diagramDesc">
+  <title id="diagramTitle">Deep Research Agent — Complete Architecture Diagram</title>
+  <desc id="diagramDesc">Interactive multi-agent research architecture showing intake, clarification, the parallel supervisor-researcher swarm, dual-layer citation verification, and decoupled infrastructure.</desc>
+
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070a12"/>
+      <stop offset="50%" stop-color="#0b0f19"/>
+      <stop offset="100%" stop-color="#080c14"/>
+    </linearGradient>
+
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#141c2e"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+
+    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#151f32"/>
+    </linearGradient>
+
+    <linearGradient id="highlightCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+
+    <linearGradient id="highlightPurple" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+
+    <linearGradient id="highlightEmerald" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+
+    <linearGradient id="highlightAmber" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+
+    <!-- Arrow Markers -->
+    <marker id="arrow-cyan" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <polygon points="0 1, 7 4, 0 7" fill="#38bdf8"/>
+    </marker>
+
+    <marker id="arrow-emerald" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <polygon points="0 1, 7 4, 0 7" fill="#34d399"/>
+    </marker>
+
+    <marker id="arrow-purple" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <polygon points="0 1, 7 4, 0 7" fill="#c084fc"/>
+    </marker>
+
+    <marker id="arrow-amber" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <polygon points="0 1, 7 4, 0 7" fill="#fbbf24"/>
+    </marker>
+
+    <marker id="arrow-muted" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <polygon points="0 1, 7 4, 0 7" fill="#64748b"/>
+    </marker>
+
+    <!-- Filter Shadows -->
+    <filter id="shadow-soft" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+
+    <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#38bdf8" flood-opacity="0.35"/>
+    </filter>
+
+    <style>
+      .font-sans { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+      .header-title { font-size: 20px; font-weight: 800; fill: #ffffff; letter-spacing: -0.5px; }
+      .header-meta { font-size: 13px; font-weight: 500; fill: #94a3b8; }
+      .section-badge { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+      .node-title { font-size: 13px; font-weight: 700; fill: #f8fafc; }
+      .node-desc { font-size: 11px; font-weight: 400; fill: #94a3b8; }
+      .node-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; }
+      .wire { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .wire-cyan { stroke: #38bdf8; stroke-width: 2; marker-end: url(#arrow-cyan); }
+      .wire-emerald { stroke: #34d399; stroke-width: 2; marker-end: url(#arrow-emerald); }
+      .wire-purple { stroke: #c084fc; stroke-width: 2; marker-end: url(#arrow-purple); }
+      .wire-amber { stroke: #fbbf24; stroke-width: 2; marker-end: url(#arrow-amber); }
+      .wire-muted { stroke: #475569; stroke-width: 1.8; marker-end: url(#arrow-muted); }
+      .wire-dashed { stroke-dasharray: 5 4; }
+    </style>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1440" height="900" fill="url(#bgGrad)"/>
+
+  <!-- Outer Card Frame with subtle border -->
+  <rect x="20" y="20" width="1400" height="860" rx="16" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+
+  <!-- ===================================================================== -->
+  <!-- HEADER SECTION                                                        -->
+  <!-- ===================================================================== -->
+  <g class="font-sans" transform="translate(45, 45)">
+    <!-- Status Icon -->
+    <rect x="0" y="2" width="10" height="10" rx="5" fill="#38bdf8" filter="url(#glow-cyan)"/>
+    <text x="22" y="12" class="header-title">DEEP RESEARCH AGENT</text>
+    <text x="250" y="12" class="header-meta">|   Supervisor–Researcher Multi-Agent Engine on LangGraph</text>
+
+    <!-- Top Badges -->
+    <g transform="translate(850, -5)">
+      <!-- Badge 1 -->
+      <rect x="0" y="0" width="125" height="26" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="62" y="17" text-anchor="middle" class="node-tag" fill="#94a3b8">PEP 517 src/ layout</text>
+
+      <!-- Badge 2 -->
+      <rect x="135" y="0" width="130" height="26" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="200" y="17" text-anchor="middle" class="node-tag" fill="#38bdf8">Clean Architecture</text>
+
+      <!-- Badge 3 -->
+      <rect x="275" y="0" width="170" height="26" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="360" y="17" text-anchor="middle" class="node-tag" fill="#34d399">Dual-Layer Verified Citations</text>
+    </g>
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- ROW 1: INTAKE & PLANNING (Y: 90 - 290)                                -->
+  <!-- ===================================================================== -->
+
+  <!-- Card 1: 01 / INTAKE & ROUTING -->
+  <g class="font-sans">
+    <rect x="40" y="90" width="650" height="195" rx="12" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.2" filter="url(#shadow-soft)"/>
+    <!-- Card header -->
+    <text x="60" y="118" class="section-badge" fill="#38bdf8">01 • Intake &amp; Arbitration</text>
+    
+    <!-- Node: User Query -->
+    <g transform="translate(60, 135)">
+      <rect width="115" height="65" rx="8" fill="url(#nodeGrad)" stroke="#38bdf8" stroke-width="1.2"/>
+      <text x="57" y="28" text-anchor="middle" class="node-title">User Inquery</text>
+      <text x="57" y="46" text-anchor="middle" class="node-desc">Raw question</text>
+    </g>
+
+    <!-- Node: Session Check -->
+    <g transform="translate(205, 135)">
+      <rect width="125" height="65" rx="8" fill="url(#nodeGrad)" stroke="#334155" stroke-width="1.2"/>
+      <text x="62" y="28" text-anchor="middle" class="node-title">Session Check</text>
+      <text x="62" y="46" text-anchor="middle" class="node-desc">Restore state</text>
+    </g>
+
+    <!-- Node: Intent Arbitrator -->
+    <g transform="translate(360, 135)">
+      <rect width="135" height="65" rx="8" fill="url(#nodeGrad)" stroke="#334155" stroke-width="1.2"/>
+      <text x="67" y="28" text-anchor="middle" class="node-title">Intent Arbitrator</text>
+      <text x="67" y="46" text-anchor="middle" class="node-desc">LLM classification</text>
+    </g>
+
+    <!-- Sub-node: Fast Exit -->
+    <g transform="translate(525, 135)">
+      <rect width="145" height="42" rx="6" fill="#1e1b2e" stroke="#c084fc" stroke-width="1"/>
+      <text x="72" y="24" text-anchor="middle" class="node-desc" fill="#e9d5ff">Meta / Out-of-Scope</text>
+    </g>
+
+    <!-- Sub-node: Semantic Cache -->
+    <g transform="translate(525, 185)">
+      <rect width="145" height="45" rx="6" fill="#142328" stroke="#2dd4bf" stroke-width="1"/>
+      <text x="72" y="22" text-anchor="middle" class="node-title" fill="#5eead4" font-size="12">Semantic Cache</text>
+      <text x="72" y="36" text-anchor="middle" class="node-desc" font-size="10">Cosine sim + version hash</text>
+    </g>
+
+    <!-- Connectors inside Intake -->
+    <path d="M 175 167 L 205 167" class="wire wire-cyan"/>
+    <path d="M 330 167 L 360 167" class="wire wire-cyan"/>
+    <path d="M 495 156 L 525 156" class="wire wire-purple wire-dashed"/>
+    <path d="M 495 178 L 515 178 L 515 207 L 525 207" class="wire wire-emerald"/>
+  </g>
+
+  <!-- Card 2: 02 / CLARIFICATION & BRIEFING -->
+  <g class="font-sans">
+    <rect x="710" y="90" width="690" height="195" rx="12" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.2" filter="url(#shadow-soft)"/>
+    <text x="730" y="118" class="section-badge" fill="#a855f7">02 • Clarification &amp; Planning</text>
+
+    <!-- Node: Clarify Agent -->
+    <g transform="translate(730, 135)">
+      <rect width="190" height="65" rx="8" fill="url(#nodeGrad)" stroke="#a855f7" stroke-width="1.2"/>
+      <text x="95" y="28" text-anchor="middle" class="node-title">Clarification Agent</text>
+      <text x="95" y="46" text-anchor="middle" class="node-desc">Evaluates ambiguity</text>
+    </g>
+
+    <!-- Node: User Interaction -->
+    <g transform="translate(950, 135)">
+      <rect width="180" height="65" rx="8" fill="url(#nodeGrad)" stroke="#334155" stroke-width="1.2"/>
+      <text x="90" y="28" text-anchor="middle" class="node-title">Workbench Clarify</text>
+      <text x="90" y="46" text-anchor="middle" class="node-desc">User input / answers</text>
+    </g>
+
+    <!-- Node: Research Brief -->
+    <g transform="translate(1160, 135)">
+      <rect width="220" height="65" rx="8" fill="url(#nodeGrad)" stroke="#34d399" stroke-width="1.2"/>
+      <text x="110" y="28" text-anchor="middle" class="node-title">Research Brief</text>
+      <text x="110" y="46" text-anchor="middle" class="node-desc">Sub-questions &amp; scope contract</text>
+    </g>
+
+    <!-- Connectors inside Planning -->
+    <path d="M 670 207 L 730 167" class="wire wire-emerald"/>
+    <path d="M 920 167 L 950 167" class="wire wire-purple"/>
+    <path d="M 1130 167 L 1160 167" class="wire wire-emerald"/>
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- ROW 2: MULTI-AGENT PARALLEL SWARM (Y: 305 - 575)                      -->
+  <!-- ===================================================================== -->
+  <g class="font-sans">
+    <rect x="40" y="305" width="1360" height="270" rx="14" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.5" filter="url(#shadow-soft)"/>
+    <text x="60" y="335" class="section-badge" fill="#34d399">03 • Multi-Agent Parallel Swarm (Supervisor ⇄ Researchers)</text>
+
+    <!-- Node: Supervisor Agent (Orchestration Brain) -->
+    <g transform="translate(60, 360)">
+      <rect width="240" height="135" rx="10" fill="#132338" stroke="#38bdf8" stroke-width="1.5"/>
+      <rect x="15" y="15" width="70" height="20" rx="4" fill="#0284c7" fill-opacity="0.3"/>
+      <text x="50" y="29" text-anchor="middle" class="node-tag" fill="#38bdf8">BRAIN LLM</text>
+      
+      <text x="15" y="60" class="node-title" font-size="15">Supervisor Agent</text>
+      <text x="15" y="80" class="node-desc">• Decomposes research plan</text>
+      <text x="15" y="96" class="node-desc">• Analyzes findings &amp; gaps</text>
+      <text x="15" y="112" class="node-desc">• Formulates follow-up queries</text>
+    </g>
+
+    <!-- Sub-container: CONCURRENCY GATE & WORKER POOL -->
+    <g transform="translate(330, 350)">
+      <!-- Gate Box -->
+      <rect width="660" height="155" rx="10" fill="#090d16" stroke="#0ea5e9" stroke-width="1.2" stroke-dasharray="6 4"/>
+      <text x="20" y="24" class="section-badge" fill="#38bdf8" font-size="10">Concurrency Gate  |  asyncio.Semaphore (Max Concurrent = 3)</text>
+
+      <!-- Worker 1 -->
+      <g transform="translate(20, 38)">
+        <rect width="190" height="100" rx="8" fill="url(#nodeGrad)" stroke="#334155" stroke-width="1"/>
+        <text x="15" y="25" class="node-title">Researcher 1</text>
+        <text x="15" y="44" class="node-desc">Tavily Web Search</text>
+        <text x="15" y="60" class="node-desc">Page scraping &amp; extract</text>
+        <rect x="15" y="72" width="75" height="18" rx="4" fill="#0f172a"/>
+        <text x="52" y="85" text-anchor="middle" class="node-tag" fill="#94a3b8">Worker Model</text>
+      </g>
+
+      <!-- Worker 2 -->
+      <g transform="translate(235, 38)">
+        <rect width="190" height="100" rx="8" fill="url(#nodeGrad)" stroke="#334155" stroke-width="1"/>
+        <text x="15" y="25" class="node-title">Researcher 2</text>
+        <text x="15" y="44" class="node-desc">Tavily Web Search</text>
+        <text x="15" y="60" class="node-desc">Page scraping &amp; extract</text>
+        <rect x="15" y="72" width="75" height="18" rx="4" fill="#0f172a"/>
+        <text x="52" y="85" text-anchor="middle" class="node-tag" fill="#94a3b8">Worker Model</text>
+      </g>
+
+      <!-- Worker N -->
+      <g transform="translate(450, 38)">
+        <rect width="190" height="100" rx="8" fill="url(#nodeGrad)" stroke="#334155" stroke-width="1"/>
+        <text x="15" y="25" class="node-title">Researcher N</text>
+        <text x="15" y="44" class="node-desc">Parallel Coroutines</text>
+        <text x="15" y="60" class="node-desc">Zero state leakage</text>
+        <rect x="15" y="72" width="75" height="18" rx="4" fill="#0f172a"/>
+        <text x="52" y="85" text-anchor="middle" class="node-tag" fill="#94a3b8">Fan-out Send()</text>
+      </g>
+    </g>
+
+    <!-- Node: Compression Layer -->
+    <g transform="translate(1015, 370)">
+      <rect width="175" height="115" rx="8" fill="url(#nodeGrad)" stroke="#fbbf24" stroke-width="1.2"/>
+      <text x="15" y="30" class="node-title">Compression</text>
+      <text x="15" y="52" class="node-desc">• Deduplicates findings</text>
+      <text x="15" y="70" class="node-desc">• Summarizes key notes</text>
+      <text x="15" y="88" class="node-desc">• Context density filter</text>
+    </g>
+
+    <!-- Node: Stopping Rules & Convergence -->
+    <g transform="translate(1215, 370)">
+      <rect width="165" height="115" rx="8" fill="url(#nodeGrad)" stroke="#f43f5e" stroke-width="1.2"/>
+      <text x="15" y="30" class="node-title">Stopping Rules</text>
+      <text x="15" y="52" class="node-desc">• LoopBudget check</text>
+      <text x="15" y="70" class="node-desc">• Information gain (ΔI)</text>
+      <text x="15" y="88" class="node-desc">• Stagnation break</text>
+    </g>
+
+    <!-- Connectors for Swarm -->
+    <!-- From Brief down to Supervisor -->
+    <path d="M 1270 200 L 1270 260 L 180 260 L 180 360" class="wire wire-emerald"/>
+
+    <!-- Supervisor fan-out to Concurrency Gate -->
+    <path d="M 300 425 L 330 425" class="wire wire-cyan"/>
+
+    <!-- Worker Pool to Compression -->
+    <path d="M 990 425 L 1015 425" class="wire wire-amber"/>
+
+    <!-- Compression to Stopping Rules -->
+    <path d="M 1190 425 L 1215 425" class="wire wire-amber"/>
+
+    <!-- Loopback from Stopping Rules to Supervisor (Bottom rail) -->
+    <path d="M 1295 485 L 1295 540 L 180 540 L 180 495" class="wire wire-purple wire-dashed"/>
+    <text x="735" y="534" text-anchor="middle" class="node-tag" fill="#c084fc">Gap Detected / Next Round Iteration (Loop)</text>
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- ROW 3: VERIFICATION, SYNTHESIS & PRESENTATION (Y: 595 - 770)          -->
+  <!-- ===================================================================== -->
+  <g class="font-sans">
+    <rect x="40" y="595" width="1360" height="175" rx="14" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.5" filter="url(#shadow-soft)"/>
+    <text x="60" y="625" class="section-badge" fill="#fbbf24">04 • Dual-Layer Verification &amp; Executive Delivery</text>
+
+    <!-- Node: Citation Verification -->
+    <g transform="translate(60, 645)">
+      <rect width="300" height="105" rx="10" fill="url(#nodeGrad)" stroke="#34d399" stroke-width="1.5"/>
+      <text x="20" y="28" class="node-title">Dual-Layer Citation Verifier</text>
+      
+      <!-- Layer 1 -->
+      <rect x="20" y="42" width="260" height="24" rx="4" fill="#064e3b" fill-opacity="0.4"/>
+      <text x="30" y="58" class="node-desc" fill="#6ee7b7">Layer 1: NLI Entailment &amp; Claim Grounding</text>
+
+      <!-- Layer 2 -->
+      <rect x="20" y="72" width="260" height="24" rx="4" fill="#064e3b" fill-opacity="0.4"/>
+      <text x="30" y="88" class="node-desc" fill="#6ee7b7">Layer 2: CrossRef &amp; Semantic Scholar Verification</text>
+    </g>
+
+    <!-- Node: Report Synthesizer -->
+    <g transform="translate(390, 645)">
+      <rect width="250" height="105" rx="10" fill="url(#nodeGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="20" y="28" class="node-title">Executive Report Synthesizer</text>
+      <text x="20" y="50" class="node-desc">• Compiles cited Markdown report</text>
+      <text x="20" y="68" class="node-desc">• Structured [A], [B] reference index</text>
+      <text x="20" y="86" class="node-desc">• Executive summary &amp; section analysis</text>
+    </g>
+
+    <!-- Node: SSE Streaming Adapter -->
+    <g transform="translate(670, 645)">
+      <rect width="210" height="105" rx="10" fill="url(#nodeGrad)" stroke="#c084fc" stroke-width="1.2"/>
+      <text x="20" y="28" class="node-title">FastAPI SSE Adapter</text>
+      <text x="20" y="50" class="node-desc">• Real-time token streaming</text>
+      <text x="20" y="68" class="node-desc">• Agent thought process feed</text>
+      <text x="20" y="86" class="node-desc">• Discovered source chip updates</text>
+    </g>
+
+    <!-- Node: Executive Canvas UI -->
+    <g transform="translate(910, 645)">
+      <rect width="465" height="105" rx="10" fill="#141c30" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="20" y="28" class="node-title" fill="#38bdf8">Executive Canvas UI (React 18 + Vite)</text>
+      <text x="20" y="52" class="node-desc" fill="#e2e8f0">• Interactive citation popovers with direct academic &amp; web previews</text>
+      <text x="20" y="70" class="node-desc" fill="#e2e8f0">• Side-by-side reading view with interactive Table of Contents</text>
+      <text x="20" y="88" class="node-desc" fill="#e2e8f0">• Clean Markdown copy &amp; document export</text>
+    </g>
+
+    <!-- Connectors for Verification & Delivery -->
+    <!-- From Stopping Rules down to Citation Verifier -->
+    <path d="M 1300 485 L 1300 595 L 210 595 L 210 645" class="wire wire-emerald"/>
+
+    <path d="M 360 697 L 390 697" class="wire wire-emerald"/>
+    <path d="M 640 697 L 670 697" class="wire wire-cyan"/>
+    <path d="M 880 697 L 910 697" class="wire wire-purple"/>
+  </g>
+
+  <!-- ===================================================================== -->
+  <!-- ROW 4: DECOUPLED INFRASTRUCTURE & GUARDS (Y: 790 - 860)               -->
+  <!-- ===================================================================== -->
+  <g class="font-sans">
+    <rect x="40" y="790" width="1360" height="70" rx="10" fill="#080c14" stroke="#1e293b" stroke-width="1.2"/>
+    <text x="60" y="812" class="section-badge" fill="#64748b" font-size="10">DECOUPLED INFRASTRUCTURE (Ports &amp; Adapters Layer • src/infra/interfaces.py)</text>
+
+    <!-- Capsule 1: Model Router -->
+    <g transform="translate(60, 822)">
+      <rect width="250" height="30" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="125" y="19" text-anchor="middle" class="node-tag" fill="#94a3b8">Model Router: Groq / Cerebras / Ollama / OpenAI</text>
+    </g>
+
+    <!-- Capsule 2: Search Adapter -->
+    <g transform="translate(325, 822)">
+      <rect width="210" height="30" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="105" y="19" text-anchor="middle" class="node-tag" fill="#94a3b8">Search Adapter: Tavily Search Client</text>
+    </g>
+
+    <!-- Capsule 3: Checkpointer -->
+    <g transform="translate(550, 822)">
+      <rect width="240" height="30" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="120" y="19" text-anchor="middle" class="node-tag" fill="#94a3b8">Checkpointer: PostgresSaver / InMemory</text>
+    </g>
+
+    <!-- Capsule 4: Harness -->
+    <g transform="translate(805, 822)">
+      <rect width="270" height="30" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="135" y="19" text-anchor="middle" class="node-tag" fill="#94a3b8">Harness Layer: Hermes Protocol &amp; Linter</text>
+    </g>
+
+    <!-- Capsule 5: Tracing & Grounding -->
+    <g transform="translate(1090, 822)">
+      <rect width="285" height="30" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="142" y="19" text-anchor="middle" class="node-tag" fill="#94a3b8">Grounding &amp; Tracing: Temporal + Langfuse</text>
+    </g>
+  </g>
+
+</svg>

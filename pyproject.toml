@@ -21,6 +21,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+postgres = [
+  "langgraph-checkpoint-postgres>=2.0,<4",
+  "psycopg[binary]>=3.2,<4",
+]
 production = [
   "langgraph-checkpoint-postgres>=2.0,<4",
   "psycopg[binary]>=3.2,<4",
@@ -44,22 +48,11 @@ dev = [
 include-package-data = true
 
 [tool.setuptools.packages.find]
-include = [
-  "api*",
-  "caching*",
-  "clarify*",
-  "compression*",
-  "infra*",
-  "reporting*",
-  "research_brief*",
-  "researcher*",
-  "state*",
-  "supervisor*",
-  "verification*",
-]
+where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 asyncio_mode = "auto"
 addopts = "-ra"
 

@@ -85,7 +85,7 @@ def ensure_ollama_running(
     Args:
         base_url: The root or v1 URL of Ollama (e.g. http://localhost:11434).
         timeout_seconds: Maximum seconds to wait for server readiness.
-        enable_flash_attention: Inject OLLAMA_FLASH_ATTENTION=1 for GPU speedup (e.g. RTX 3050).
+        enable_flash_attention: Inject OLLAMA_FLASH_ATTENTION=1 for GPU speedup (e.g. modern NVIDIA GPUs).
 
     Returns:
         True if server is running and healthy, False otherwise.

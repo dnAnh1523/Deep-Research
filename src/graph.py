@@ -33,6 +33,7 @@ class ResearchGraphState(AgentState):
 
     raw_findings: Annotated[list[str], operator.add]
     visited_urls: Annotated[list[str], operator.add]
+    sources: Annotated[list[dict], operator.add]
     intent: str
     cache_hit: bool
 
@@ -53,8 +54,8 @@ def build_research_graph(
     - Compile graph receives checkpointer as a parameter (injected from outside).
     - Routing for Intent Arbitrator and Semantic Cache uses add_conditional_edges.
     - Researcher fan-out uses Send with count exactly matching queries for the round.
-    - Tiered Hybrid Routing: worker_llm (Local SLM) powers researcher and compression;
-      llm (Cloud LLM) powers supervisor, brief, and reporting.
+    - Role-based routing: worker_llm powers researcher and compression;
+      llm powers clarification, brief, supervision, verification, and reporting.
     """
     if concurrency_gate is None:
         concurrency_gate = ConcurrencyGate(max_concurrent=3)
@@ -87,6 +88,7 @@ def build_research_graph(
             "supervisor": sup,
             "raw_findings": [],
             "visited_urls": state.get("visited_urls", []),
+            "sources": state.get("sources", []),
             "final_report": state.get("final_report"),
             "intent": "RESEARCH",
             "cache_hit": False,
@@ -221,6 +223,7 @@ def build_research_graph(
         return {
             "raw_findings": res.get("findings", []),
             "visited_urls": res.get("visited_urls", []),
+            "sources": res.get("sources", []),
         }
 
     async def compression_step(state: ResearchGraphState) -> dict:

@@ -1,14 +1,32 @@
 {
-  "primary": [
-    {
-      "provider": "my-gateway",
-      "protocol": "openai-compatible",
-      "model": "my-model-id",
-      "base_url": "https://gateway.example.com/v1",
-      "api_key_env": "MY_GATEWAY_API_KEY",
-      "supports_tools": true,
-      "supports_structured_output": false
+  "roles": {
+    "brain": {
+      "primary": [
+        {
+          "provider": "my-gateway",
+          "protocol": "openai-compatible",
+          "model": "my-brain-model-id",
+          "base_url": "https://gateway.example.com/v1",
+          "api_key_env": "MY_GATEWAY_API_KEY",
+          "supports_tools": true,
+          "supports_structured_output": false
+        }
+      ],
+      "fallback": null
+    },
+    "worker": {
+      "primary": [
+        {
+          "provider": "my-gateway",
+          "protocol": "openai-compatible",
+          "model": "my-worker-model-id",
+          "base_url": "https://gateway.example.com/v1",
+          "api_key_env": "MY_GATEWAY_API_KEY",
+          "supports_tools": true,
+          "supports_structured_output": false
+        }
+      ],
+      "fallback": null
     }
-  ],
-  "fallback": null
+  }
 }

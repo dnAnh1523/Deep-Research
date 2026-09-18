@@ -450,6 +450,44 @@ def test_native_httpx_429_dynamic_cooldown_and_fallback():
     asyncio.run(run())
 
 
+def test_native_httpx_preserves_groq_compound_model_id():
+    """Groq Compound IDs are namespaced and must not be reduced to `compound`."""
+    from unittest.mock import AsyncMock, patch
+    import httpx
+
+    async def run():
+        mock_response = httpx.Response(
+            status_code=200,
+            json={
+                "choices": [{"message": {"role": "assistant", "content": "Compound response"}}],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
+            },
+            request=httpx.Request("POST", "https://api.groq.com/openai/v1/chat/completions"),
+        )
+
+        with patch.object(httpx.AsyncClient, "post", new_callable=AsyncMock) as mock_post:
+            mock_post.return_value = mock_response
+            router = ModelRouter(
+                providers=[
+                    ProviderConfig(
+                        provider="groq",
+                        model="groq/compound",
+                        api_key="gsk_mock",
+                        max_retries=1,
+                    )
+                ]
+            )
+
+            response = await router.complete(prompt="Research AI education")
+
+            assert response.content == "Compound response"
+            payload = mock_post.call_args.kwargs["json"]
+            assert payload["model"] == "groq/compound"
+            assert "reasoning_format" not in payload
+
+    asyncio.run(run())
+
+
 def test_groq_tool_use_failed_defensive_recovery():
     """Verify Groq HTTP 400 with tool_use_failed recovers generation without raising error."""
     from unittest.mock import AsyncMock, patch
@@ -484,7 +522,5 @@ def test_groq_tool_use_failed_defensive_recovery():
             assert resp.usage["total_tokens"] > 0
 
     asyncio.run(run())
-
-
 
 

@@ -1,7 +1,7 @@
 """Checkpointer adapter managing session persistence.
 
-Supports InMemorySaver for local development and testing (ENV=dev),
-and PostgresSaver (pointing to Supabase/PostgreSQL) for production.
+Supports InMemorySaver for ephemeral runs and testing,
+and PostgresSaver for persistent storage when DATABASE_URL is configured.
 """
 
 import os
@@ -10,7 +10,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 
 def get_in_memory_checkpointer() -> InMemorySaver:
-    """Return an in-memory checkpointer suitable for development and fast testing."""
+    """Return an in-memory checkpointer suitable for ephemeral runs and fast testing."""
     return InMemorySaver()
 
 
@@ -49,17 +49,17 @@ def get_postgres_checkpointer(*, connection_string: str | None = None) -> Any:
     except ImportError as exc:
         raise ImportError(
             "langgraph.checkpoint.postgres is not installed. "
-            "Please install the 'production' extra or use InMemorySaver for development."
+            "Please install postgres dependencies (e.g. 'pip install .[postgres]') or use InMemorySaver."
         ) from exc
 
 
 def get_checkpointer() -> Any:
-    """Retrieve checkpointer instance based on ENV environment variable.
+    """Retrieve checkpointer instance based on environment configuration.
 
-    Returns InMemorySaver when ENV is 'dev', 'development', 'local', or 'test'.
-    Returns PostgresSaver when ENV is 'prod' or 'production'.
+    Returns PostgresSaver when DATABASE_URL or SUPABASE_DATABASE_URL is set.
+    Otherwise defaults to InMemorySaver.
     """
-    env = os.getenv("ENV", "dev").strip().lower()
-    if env in ("dev", "development", "local", "test"):
-        return get_in_memory_checkpointer()
-    return get_postgres_checkpointer()
+    conn_str = os.getenv("DATABASE_URL") or os.getenv("SUPABASE_DATABASE_URL")
+    if conn_str and conn_str.strip():
+        return get_postgres_checkpointer()
+    return get_in_memory_checkpointer()

@@ -98,7 +98,7 @@ def test_research_query_action_temporal_anchoring():
 
 def test_clean_architecture_boundaries_infra_temporal():
     """Verify infra/temporal.py imports ONLY stdlib modules, strictly 0 external deps."""
-    temporal_file = Path(__file__).resolve().parent.parent / "infra" / "temporal.py"
+    temporal_file = Path(__file__).resolve().parent.parent / "src" / "infra" / "temporal.py"
     tree = ast.parse(temporal_file.read_text(encoding="utf-8"), filename=str(temporal_file))
 
     allowed_stdlib = {"dataclasses", "datetime", "re", "typing"}

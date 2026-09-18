@@ -1,6 +1,6 @@
 """Concurrency Gate managing parallel coroutines.
 
-Enforces throughput boundaries (defaulting to N=3 for Groq free-tier rate limits)
+Enforces throughput boundaries (defaulting to N=3 to balance speed and upstream API rate limits)
 via asyncio.Semaphore. Allows callers to submit any number of tasks simultaneously
 while strictly throttling concurrent active execution.
 """

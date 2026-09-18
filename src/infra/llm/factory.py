@@ -28,6 +28,7 @@ DEFAULT_BASE_URLS: dict[str, str] = {
 }
 
 DEFAULT_PROTOCOLS = {"anthropic": "anthropic"}
+RoleProviderConfig = tuple[list[ProviderConfig], ProviderConfig | None]
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -93,21 +94,12 @@ def load_provider_config(
     config_path = settings.resolve_path(settings.provider_config_file)
     if config_path.exists():
         raw = _read_json(config_path)
-        primary_raw = raw.get("primary", [])
-        if not isinstance(primary_raw, list):
-            raise ValueError("providers.primary must be an array")
-        primary = [
-            _provider_from_dict(item, source=str(config_path), environ=env)
-            for item in primary_raw
-            if isinstance(item, dict)
-        ]
-        fallback_raw = raw.get("fallback")
-        fallback = (
-            _provider_from_dict(fallback_raw, source=str(config_path), environ=env)
-            if isinstance(fallback_raw, dict)
-            else None
-        )
-        return primary, fallback
+        roles_raw = raw.get("roles")
+        if isinstance(roles_raw, dict) and isinstance(roles_raw.get("brain"), dict):
+            return _load_provider_block(
+                roles_raw["brain"], source=str(config_path), environ=env
+            )
+        return _load_provider_block(raw, source=str(config_path), environ=env)
 
     discovered: list[ProviderConfig] = []
     known = ["openai", "anthropic", "groq", "cerebras", "openrouter", "ollama"]
@@ -168,9 +160,96 @@ def load_provider_config(
     return discovered, fallback
 
 
-def build_model_router(settings: AppSettings) -> ModelRouter | None:
+def _load_provider_block(
+    raw: dict[str, Any], *, source: str, environ: dict[str, str]
+) -> RoleProviderConfig:
+    """Parse one provider block shared by legacy and role-based config."""
+    if "primary" not in raw and raw.get("provider"):
+        raw = {"primary": [raw]}
+
+    primary_raw = raw.get("primary", [])
+    if not isinstance(primary_raw, list):
+        raise ValueError("providers.primary must be an array")
+    primary = [
+        _provider_from_dict(item, source=source, environ=environ)
+        for item in primary_raw
+        if isinstance(item, dict)
+    ]
+
+    fallback_raw = raw.get("fallback")
+    fallback = (
+        _provider_from_dict(fallback_raw, source=source, environ=environ)
+        if isinstance(fallback_raw, dict)
+        else None
+    )
+    return primary, fallback
+
+
+def load_role_provider_configs(
+    settings: AppSettings,
+    *,
+    environ: dict[str, str] | None = None,
+) -> dict[str, RoleProviderConfig]:
+    """Load optional role-specific provider blocks from ``providers.json``.
+
+    Role blocks intentionally stay at the composition seam: graph nodes only
+    receive the ``brain`` or ``worker`` adapter and do not know model names.
+    """
+    env = environ or os.environ
+    config_path = settings.resolve_path(settings.provider_config_file)
+    if not config_path.exists():
+        return {}
+
+    raw = _read_json(config_path)
+    roles_raw = raw.get("roles")
+    if not isinstance(roles_raw, dict):
+        return {}
+
+    roles: dict[str, RoleProviderConfig] = {}
+    for role_name, role_raw in roles_raw.items():
+        if isinstance(role_name, str) and isinstance(role_raw, dict):
+            roles[role_name] = _load_provider_block(
+                role_raw, source=str(config_path), environ=env
+            )
+    return roles
+
+
+def _router_from_provider_config(config: RoleProviderConfig) -> ModelRouter | None:
+    providers, fallback = config
+    if not providers:
+        return None
+    return ModelRouter(providers=providers, fallback=fallback)
+
+
+def build_model_routers(
+    settings: AppSettings,
+    *,
+    environ: dict[str, str] | None = None,
+) -> tuple[ModelRouter | None, ModelRouter | None]:
+    """Build the ``brain`` and ``worker`` routers with legacy fallback.
+
+    A legacy single-provider config deliberately returns the same adapter for
+    both roles, preserving the original one-model runtime behaviour.
+    """
+    roles = load_role_provider_configs(settings, environ=environ)
+    if not roles:
+        shared = build_model_router(settings, environ=environ)
+        return shared, shared
+
+    brain = _router_from_provider_config(roles.get("brain", ([], None)))
+    worker = _router_from_provider_config(roles.get("worker", ([], None)))
+    brain = brain or worker
+    worker = worker or brain
+    return brain, worker
+
+
+def build_model_router(
+    settings: AppSettings,
+    *,
+    environ: dict[str, str] | None = None,
+) -> ModelRouter | None:
     """Create a router or return `None` when no usable provider is configured."""
-    providers, fallback = load_provider_config(settings)
+    providers, fallback = load_provider_config(settings, environ=environ)
     if not providers:
         return None
     return ModelRouter(providers=providers, fallback=fallback)

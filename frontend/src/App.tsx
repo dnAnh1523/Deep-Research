@@ -121,6 +121,34 @@ export function App() {
     setIsSidebarOpen(false);
   };
 
+  // Remove a saved research session from the sidebar and local storage.
+  const handleDeleteSession = (sessionId: string) => {
+    const target = sessions.find((session) => session.id === sessionId);
+    if (!target || (sessionId === currentSessionId && isStreaming)) return;
+
+    const title = target.title || 'Chủ đề nghiên cứu';
+    if (!window.confirm(`Xóa nghiên cứu "${title}" khỏi danh sách?`)) return;
+
+    const remainingSessions = sessions.filter((session) => session.id !== sessionId);
+    setSessions(remainingSessions);
+
+    if (sessionId !== currentSessionId) return;
+
+    const nextSession = remainingSessions[0];
+    setCurrentSessionId(nextSession?.id || null);
+    setMessages(nextSession?.messages || []);
+    setCurrentPlan(nextSession?.plan || null);
+    setStatus(nextSession?.status || 'idle');
+    setThoughtSteps(nextSession?.thoughtSteps || []);
+    setWebSources(nextSession?.webSources || []);
+    setReport(nextSession?.report || '');
+    setCitations(nextSession?.citations || {});
+    setClarificationHistory([]);
+    setIsCanvasOpen(Boolean(nextSession?.report || nextSession?.status === 'researching'));
+    setCanvasMode(nextSession?.report ? 'report' : 'progress');
+    setIsSidebarOpen(false);
+  };
+
   // Update session in store
   const updateSessionRecord = useCallback(
     (updates: Partial<ResearchSession>) => {
@@ -270,13 +298,7 @@ export function App() {
     setCanvasMode('progress');
 
     // Clear previous thoughts & sources
-    setThoughtSteps([
-      {
-        id: 'step-init',
-        title: `Nghiên cứu: ${currentPlan.title}`,
-        detail: 'Bắt đầu khởi động các tác tử và tìm kiếm dữ liệu trên internet...',
-      },
-    ]);
+    setThoughtSteps([]);
     setWebSources([]);
 
     updateSessionRecord({
@@ -346,7 +368,9 @@ export function App() {
         onToggle={() => setIsSidebarOpen((prev) => !prev)}
         sessions={sessions}
         currentSessionId={currentSessionId}
+        isCurrentSessionStreaming={isStreaming}
         onSelectSession={handleSelectSession}
+        onDeleteSession={handleDeleteSession}
         onNewSession={handleNewSession}
       />
 

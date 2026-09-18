@@ -1,7 +1,7 @@
 """Sliding Window Rate Limiter for LLM Providers.
 
 Implements Token Bucket / Leaky Bucket inspired Sliding Window Rate Limiting (RFC 6585)
-to proactively throttle outgoing requests and prevent 429 RateLimitErrors on free-tier APIs.
+to proactively throttle outgoing requests and prevent 429 RateLimitErrors on rate-limited endpoints.
 
 Pure Python, zero third-party dependencies, fully testable with mock time.
 """

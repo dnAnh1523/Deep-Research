@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, X, Sparkles } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import type { Citation, ThoughtStep, WebSourceChip } from '../types/research';
 import { CanvasThoughtStream } from './CanvasThoughtStream';
 import { CanvasReportViewer } from './CanvasReportViewer';
@@ -45,11 +45,6 @@ export const ResearchCanvas: React.FC<ResearchCanvasProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="hidden items-center gap-1.5 rounded-xl bg-[#1f1f1f] px-3 py-1.5 text-xs font-medium text-[#e6e6e6]/65 sm:flex">
-                  <span>Tiến trình trực tiếp</span>
-                  <ChevronDown className="h-3.5 w-3.5 text-[var(--text-tertiary)]" />
-                </div>
-
                 <button
                   type="button"
                   onClick={onClose}

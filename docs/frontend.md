@@ -203,7 +203,7 @@ npm install
 npm run dev        # Vite dev server tại http://localhost:3000
 ```
 
-Build production:
+Build static assets:
 ```bash
 npm run build      # Output tại frontend/dist/
 ```

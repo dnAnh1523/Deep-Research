@@ -7,7 +7,7 @@
 
 ## Tổng quan
 
-Deep Research Agent là một hệ thống nghiên cứu tự động chạy trên **LangGraph**, được thiết kế cho **người dùng phổ thông** muốn tìm hiểu sâu về bất kỳ chủ đề nào. Hệ thống tự động tìm kiếm, tổng hợp và viết báo cáo có trích dẫn nguồn. Runtime hiện hỗ trợ cấu hình provider/model tuỳ ý qua `config/providers.json`; các bảng bên dưới ghi lại baseline free-tier ban đầu của dự án, không phải giới hạn kiến trúc.
+Deep Research Agent là một hệ thống nghiên cứu tự động chạy trên **LangGraph**, được thiết kế cho **người dùng phổ thông** muốn tìm hiểu sâu về bất kỳ chủ đề nào. Hệ thống tự động tìm kiếm, tổng hợp và viết báo cáo có trích dẫn nguồn. Runtime hỗ trợ cấu hình provider/model tuỳ ý qua `config/providers.json` (OpenAI, Anthropic, Groq, Cerebras, OpenRouter, Ollama, vLLM...).
 
 **Stack chính:**
 - **Orchestration:** LangGraph (Python)
@@ -22,48 +22,46 @@ Deep Research Agent là một hệ thống nghiên cứu tự động chạy tr�
 
 ## Pipeline — Sơ đồ flow thực tế
 
+<p align="center">
+  <img src="assets/architecture.svg" alt="Deep Research Agent Multi-Agent Architecture" width="100%">
+</p>
+
 ```mermaid
-graph TD
-    START([User Query]) --> SC[Session Check]
-    SC --> IA[Intent Arbitrator]
-
-    IA -->|OUT_OF_SCOPE| OOS[Out of Scope → END]
-    IA -->|META_COMMAND| MC[Meta Command → END]
-    IA -->|RESEARCH| CACHE[Semantic Cache]
-
-    CACHE -->|cache hit| RPT[Reporting → END]
-    CACHE -->|cache miss| CLR[Clarify]
-
-    CLR --> BRIEF[Research Brief]
-    BRIEF --> SUP[Supervisor]
-
-    SUP -->|delegating| FAN["Fan-out via Send()"]
-    FAN --> R1[Researcher 1]
-    FAN --> R2[Researcher 2]
-    FAN --> RN[Researcher N]
-
-    R1 --> CMP[Compression]
-    R2 --> CMP
-    RN --> CMP
-
-    CMP -->|"should_force_stop = false"| SUP
-    CMP -->|"should_force_stop = true"| VER[Verification]
-
-    SUP -->|writing_report| VER
-    VER --> RPT
-
-    subgraph "Concurrency Gate"
-        R1
-        R2
-        RN
+flowchart TD
+    subgraph Intake ["1. Intake & Routing"]
+        Query["User Research Query"] --> Session["Session Check"]
+        Session --> Arbitrator{"Intent Arbitrator"}
+        Arbitrator -->|Meta / Out-of-Scope| FastExit["Direct Response / Fast Exit"]
+        Arbitrator -->|Research Intent| Cache{"Semantic Cache"}
+        Cache -->|Hit| FastDelivery["Cached Verified Report"]
     end
 
-    subgraph "Harness Guard Layer"
-        direction TB
-        HGL1["Hermes SETP Linter"]
-        HGL2["Domain Authority Scorer"]
-        HGL3["Observation Density Filter"]
-        HGL4["Convergence ΔI Guard"]
+    subgraph Planning ["2. Clarification & Planning"]
+        Cache -->|Miss| Clarify["Clarification Agent<br/><i>Disambiguate Scope</i>"]
+        Clarify --> Brief["Research Brief<br/><i>Structured Objectives & Sub-questions</i>"]
+    end
+
+    subgraph Swarm ["3. Multi-Agent Parallel Swarm"]
+        Brief --> Supervisor["Supervisor Agent<br/><i>Multi-Round Coordination</i>"]
+        Supervisor -->|Delegate Sub-questions| Gate["Concurrency Gate<br/><i>Controlled Parallelism</i>"]
+        
+        subgraph Workers ["Parallel Researcher Pool"]
+            Gate --> R1["Researcher 1<br/><i>Tavily Search & Scrape</i>"]
+            Gate --> R2["Researcher 2<br/><i>Tavily Search & Scrape</i>"]
+            Gate --> RN["Researcher N<br/><i>Tavily Search & Scrape</i>"]
+        end
+
+        R1 & R2 & RN --> Compress["Compression Layer<br/><i>Context Density & Dedup</i>"]
+        Compress --> Stopping{"Stopping Rules<br/><i>Convergence & Budget Guard</i>"}
+        Stopping -->|Knowledge Gap / Next Round| Supervisor
+    end
+
+    subgraph Verification ["4. Verification & Synthesis"]
+        Stopping -->|Sufficient Coverage| Verifier["Dual-Layer Citation Verifier<br/><i>CrossRef · Semantic Scholar · Entailment</i>"]
+        Verifier --> Synthesizer["Executive Report Generator<br/><i>Markdown Synthesis & Citation Indexing</i>"]
+        Synthesizer --> Stream["Server-Sent Events (SSE)"]
+        Stream --> Canvas["Executive Canvas UI<br/><i>Real-time Thoughts · Citations · Export</i>"]
+        FastDelivery -.-> Canvas
     end
 ```
 
@@ -83,69 +81,19 @@ graph TD
 
 ```
 Deep Research/
-├── api/                          # FastAPI application
-│   ├── __init__.py
-│   └── app.py                    # REST + SSE endpoints
-│
-├── clarify/                      # Node: làm rõ mục tiêu
-│   ├── __init__.py
-│   └── node.py
-│
-├── research_brief/               # Node + Domain logic: sinh brief có cấu trúc
-│   ├── __init__.py
-│   ├── node.py
-│   └── validation.py             # ResearchBrief dataclass (pure Python, no LangGraph)
-│
-├── supervisor/                   # Node + Domain logic: điều phối vòng lặp
-│   ├── __init__.py
-│   ├── node.py
-│   ├── stopping_rules.py         # should_force_stop() — pure Python, no LangGraph
-│   └── concurrency_gate.py       # Semaphore giới hạn researcher đồng thời
-│
-├── researcher/                   # Node: cào và tổng hợp dữ liệu web
-│   ├── __init__.py
-│   └── node.py
-│
-├── compression/                  # Node: nén findings giữa các round
-│   ├── __init__.py
-│   └── node.py
-│
-├── verification/                 # Node + Domain logic: dedup + citation verify
-│   ├── __init__.py
-│   ├── node.py
-│   └── dedup.py                  # Source dedup — pure Python
-│
-├── reporting/                    # Node: sinh báo cáo Markdown + citation registry
-│   ├── __init__.py
-│   ├── node.py
-│   └── citation_registry.py      # Parse và quản lý trích dẫn
-│
-├── caching/                      # Domain logic: semantic cache fingerprint
-│   ├── __init__.py
-│   └── fingerprint.py            # Version fingerprint — pure Python
-│
-├── state/                        # State schemas (TypedDict)
-│   ├── __init__.py
-│   └── schema.py                 # AgentState, SupervisorState, ResearcherState
-│
-├── infra/                        # Infrastructure layer (Humble Objects)
-│   ├── __init__.py
-│   ├── interfaces.py             # typing.Protocol: LLMProvider, SearchClient
-│   ├── model_router.py           # Cooldown, fallback, pricing, Ollama support
-│   ├── search_client.py          # Tavily wrapper
-│   ├── checkpointer.py           # PostgresSaver / InMemorySaver
-│   ├── rate_limiter.py           # Token bucket rate limiter
-│   ├── temporal.py               # Temporal grounding (năm hiện tại cho truy vấn)
-│   ├── tracing.py                # Langfuse callback
-│   ├── ollama_manager.py         # Zero-touch lifecycle cho Local SLM
-│   └── harness/                  # Agent Harness Guard Layer
-│       ├── __init__.py
-│       ├── protocol.py           # Hermes SETP schema, data contracts
-│       ├── linter.py             # Pre-flight linter + synthetic error reflection
-│       ├── observation_filter.py # Domain scorer + density filter
-│       └── convergence.py        # Information Gain ΔI + stagnation guard
-│
-├── graph.py                      # Graph assembly — NƠI DUY NHẤT wiring LangGraph
+├── src/                          # Toàn bộ mã nguồn backend
+│   ├── api/                      # FastAPI application (REST + SSE endpoints)
+│   ├── clarify/                  # Node: làm rõ mục tiêu
+│   ├── research_brief/           # Node + Domain logic: sinh brief có cấu trúc
+│   ├── supervisor/               # Node + Domain logic: điều phối vòng lặp (stopping_rules, concurrency_gate)
+│   ├── researcher/               # Node: cào và tổng hợp dữ liệu web
+│   ├── compression/              # Node: nén findings giữa các round
+│   ├── verification/             # Node + Domain logic: dedup + citation verify
+│   ├── reporting/                # Node: sinh báo cáo Markdown + citation registry
+│   ├── caching/                  # Domain logic: semantic cache fingerprint
+│   ├── state/                    # State schemas (TypedDict: AgentState, SupervisorState, ResearcherState)
+│   ├── infra/                    # Infrastructure layer (model_router, search_client, harness guard...)
+│   └── graph.py                  # Graph assembly — NƠI DUY NHẤT wiring LangGraph
 │
 ├── frontend/                     # Vite + React 19 + Tailwind CSS v4
 │   └── src/
@@ -157,11 +105,12 @@ Deep Research/
 │       ├── types/                # TypeScript interfaces
 │       └── public/               # Static assets
 │
-├── tests/                        # 21 test files, 140+ tests
+├── tests/                        # 21 test files, 150+ tests
 ├── docs/                         # Tài liệu hệ thống
-├── run_demo.py                   # CLI runner (terminal demo)
-├── run_fullstack.py              # Fullstack runner (API + Frontend)
-├── .env                          # Environment variables (gitignored)
+├── config/                       # Template cấu hình providers mẫu
+├── Dockerfile                    # Containerization
+├── docker-compose.yml            # Multi-container orchestration
+├── .env.example                  # Environment template
 └── .gitignore
 ```
 

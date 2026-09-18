@@ -73,6 +73,8 @@ PAY_AS_YOU_GO_RATES: dict[tuple[str, str], tuple[float, float]] = {
     ("groq", "gemma2-9b-it"): (0.20, 0.20),
 
     # Ollama Cloud ($ / 1M tokens)
+    ("ollama", "gpt-oss:20b"): (0.07, 0.30),
+    ("ollama", "gpt-oss:20b-cloud"): (0.07, 0.30),
     ("ollama", "gpt-oss:120b"): (0.15, 0.60),
     ("ollama", "gpt-oss:120b-cloud"): (0.15, 0.60),
     ("ollama", "nemotron-3-nano:30b"): (0.08, 0.24),
@@ -369,7 +371,13 @@ class ModelRouter:
                     )
 
                 model_name = config.model
-                if config.provider == "groq" and model_name.startswith("groq/"):
+                # Groq's namespaced Compound system IDs must be sent verbatim.
+                # Other legacy `groq/<model>` aliases can still be normalized.
+                if (
+                    config.provider == "groq"
+                    and model_name.startswith("groq/")
+                    and model_name not in {"groq/compound", "groq/compound-mini"}
+                ):
                     model_name = model_name[len("groq/"):]
                 elif config.provider == "openrouter" and model_name.startswith("openrouter/"):
                     model_name = model_name[len("openrouter/"):]
@@ -436,7 +444,11 @@ class ModelRouter:
                         payload[k] = v
 
                 # API-native reasoning & provider options
-                if config.protocol.lower() != "anthropic" and config.provider == "groq":
+                if (
+                    config.protocol.lower() != "anthropic"
+                    and config.provider == "groq"
+                    and model_name not in {"groq/compound", "groq/compound-mini"}
+                ):
                     if "reasoning_format" not in payload:
                         payload["reasoning_format"] = "parsed"
                 elif config.provider == "openrouter":

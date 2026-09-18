@@ -342,7 +342,28 @@ def create_app(
                         )
                         break
 
-                    yield f"data: {json.dumps(event, default=str)}\n\n"
+                    if isinstance(event, dict) and "reporting" in event:
+                        rep_data = event.get("reporting", {})
+                        if isinstance(rep_data, dict) and "final_report" in rep_data:
+                            report_content = rep_data.get("final_report", "")
+                            try:
+                                from reporting.citation_registry import parse_sources_from_research_notes
+                                registry = parse_sources_from_research_notes([report_content])
+                                rep_data["citations"] = registry.to_citation_dict()
+                            except Exception:
+                                pass
+
+                    def _serialize_sse_event(obj: Any) -> Any:
+                        if hasattr(obj, "__dataclass_fields__"):
+                            from dataclasses import asdict
+                            return asdict(obj)
+                        if hasattr(obj, "model_dump"):
+                            return obj.model_dump()
+                        if hasattr(obj, "dict"):
+                            return obj.dict()
+                        return str(obj)
+
+                    yield f"data: {json.dumps(event, default=_serialize_sse_event)}\n\n"
             except asyncio.CancelledError:
                 logger.info(
                     "SSE stream cancelled due to connection termination."

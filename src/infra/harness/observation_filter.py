@@ -3,7 +3,7 @@
 Enforces SWE-agent / OpenHands Action-Observation constraints:
 1. Filters out 100% of Tier C spam/dictionary/aggregator domains.
 2. Prioritizes Tier A academic, technical, and primary sources.
-3. Chunks and condenses observation text (600-800 chars) to prevent RTX 3050 GPU starvation.
+3. Chunks and condenses observation text (600-800 chars) to prevent consumer GPU VRAM starvation.
 """
 
 from __future__ import annotations
@@ -177,7 +177,7 @@ def filter_and_rank_snippets(
 
     1. Discards 100% of Tier C spam/dictionary/video URLs.
     2. Prioritizes Tier A academic sources and high-density keyword matches.
-    3. Condenses raw text into 600-800 characters, safeguarding local RTX 3050 VRAM.
+    3. Condenses raw text into 600-800 characters, safeguarding local GPU VRAM.
     """
     if not results:
         return []
