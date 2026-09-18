@@ -31,7 +31,7 @@ production = [
 ]
 observability = [
   "langfuse[langchain]>=2,<3",
-  "litellm>=1.50,<2",
+  "litellm>=1.100.0,<2",
 ]
 local = [
   "huggingface-hub>=0.25,<2",
